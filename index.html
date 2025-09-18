@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Russian Reading - Complete Course</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .group-card {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .group-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        .group-card.available {
+            border-color: #28a745;
+        }
+        .group-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .group-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .group-description {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        .group-progress {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            background: #28a745;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Learn Russian Reading</h1>
+            <p>Master Russian letters through smart grouping method</p>
+        </div>
+        
+        <div class="group-card available" onclick="goToGroup(1)">
+            <div class="group-title">Group 1: Similar Letters (А К М О Т Е)</div>
+            <div class="group-description">Letters that look and sound like Latin letters</div>
+            <div class="group-progress">
+                <div class="progress-fill" style="width: 100%"></div>
+            </div>
+            <div>✅ Available</div>
+        </div>
+        
+        <div class="group-card locked">
+            <div class="group-title">Group 2: False Friends (Р Н С И У В Х)</div>
+            <div class="group-description">Letters that look familiar but sound different</div>
+            <div class="group-progress">
+                <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div>🔒 Complete Group 1 to unlock</div>
+        </div>
+        
+        <div class="group-card locked">
+            <div class="group-title">Group 3: Unique Letters</div>
+            <div class="group-description">Letters unique to Russian alphabet</div>
+            <div class="group-progress">
+                <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div>🔒 Complete Group 2 to unlock</div>
+        </div>
+        
+        <div class="group-card locked">
+            <div class="group-title">Group 4: Soft/Hard Vowels</div>
+            <div class="group-description">Vowel pairs and their pronunciation rules</div>
+            <div class="group-progress">
+                <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div>🔒 Complete Group 3 to unlock</div>
+        </div>
+        
+        <div class="group-card locked">
+            <div class="group-title">Group 5: Soft/Hard Signs</div>
+            <div class="group-description">Special letters that modify pronunciation</div>
+            <div class="group-progress">
+                <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div>🔒 Complete Group 4 to unlock</div>
+        </div>
+    </div>
+    
+    <script>
+        function goToGroup(groupNumber) {
+            if (groupNumber === 1) {
+                window.location.href = 'group1/index.html';
+            } else {
+                alert('Complete previous groups first!');
+            }
+        }
+    </script>
+</body>
+</html>

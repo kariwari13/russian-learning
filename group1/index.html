@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Russian Reading - Easy Method</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .intro-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .intro-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .intro-section p {
+            color: #495057;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .module-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .module-btn {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .module-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .module-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .exercise-selector {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .exercise-selector h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .exercise-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-btn {
+            background: white;
+            border: 2px solid #2196f3;
+            color: #2196f3;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .exercise-btn:hover {
+            background: #e3f2fd;
+            transform: translateY(-2px);
+        }
+
+        .exercise-btn.active {
+            background: #2196f3;
+            color: white;
+        }
+
+        .unlock-message {
+            color: #6c757d;
+            font-style: italic;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .learning-area {
+            text-align: center;
+            min-height: 200px;
+        }
+
+        .current-word {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .mic-btn {
+            background: #e74c3c;
+        }
+
+        .mic-btn:hover {
+            background: #c0392b;
+        }
+
+        .mic-btn.listening {
+            background: #27ae60;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .stop-btn {
+            background: #e74c3c;
+        }
+
+        .stop-btn:hover {
+            background: #c0392b;
+        }
+
+        .instruction {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .instruction h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .instruction p {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .stress-explanation {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .stress-explanation h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .stress-explanation p {
+            color: #856404;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .letters-introduced {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .letters-introduced h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .letters {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 5px;
+        }
+
+        .word-image {
+            max-width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: block;
+        }
+
+        .dictation-input {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 20px 0;
+            min-width: 200px;
+        }
+
+        .dictation-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .pronunciation-score {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .score-circle {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border: 4px solid white;
+            border-radius: 50%;
+            line-height: 52px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .check-answer-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .check-answer-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .stats-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+
+        .stats-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .stats-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .recognition-question {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .recognition-question h4 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .word-choices {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            background: #f8f9fa;
+            border: 3px solid #dee2e6;
+            color: #495057;
+            padding: 20px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .choice-btn:hover {
+            border-color: #667eea;
+            background: #e3f2fd;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .choice-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .choice-btn.correct {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .choice-btn.incorrect {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        /* Gamification Styles */
+        .achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffd89b, #19547b);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: achievementSlide 3s ease-out;
+        }
+
+        @keyframes achievementSlide {
+            0% { transform: translate(-50%, -150%); }
+            20% { transform: translate(-50%, -50%); }
+            80% { transform: translate(-50%, -50%); }
+            100% { transform: translate(-50%, -150%); }
+        }
+
+        .achievement-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+
+        .achievement-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .achievement-desc {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .level-progress {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .exp-bar {
+            background: #e9ecef;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .exp-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Badge System */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 2px;
+        }
+
+        .badge.streak {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .badge.perfect {
+            background: linear-gradient(135deg, #ffd89b, #19547b);
+            color: white;
+        }
+
+        .badge.speed {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #495057;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: #dee2e6;
+            color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .final-message {
+            background: linear-gradient(135deg, #ffd89b, #19547b);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .final-message h2 {
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .current-word {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .control-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .module-selector {
+                justify-content: center;
+            }
+
+            .module-btn {
+                flex: 1;
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="back-button">
+    <button onclick="window.location.href='../index.html'" style="
+        background: #6c757d; 
+        color: white; 
+        border: none; 
+        padding: 10px 20px; 
+        border-radius: 25px; 
+        cursor: pointer;
+        margin: 10px;
+    ">← Back to Menu</button>
+</div>
+    <div class="container">
+        <div class="header">
+            <h1>Learn Russian Reading - Easy Method</h1>
+            <p>Master Russian letters through smart grouping</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Introduction Section -->
+            <div class="intro-section" id="introSection">
+                <h2>🚀 Learn to Read Russian the Smart Way!</h2>
+                <p>Learning to read Russian isn't difficult when you follow the right method given on this platform.</p>
+                <p>All words here are international, so you'll easily guess their translations.</p>
+                <p><strong>First group:</strong> Letters that look and sound similar to Latin letters - <strong>А К М О Т Е</strong></p>
+                <button class="control-btn" onclick="startLearning()">Start Learning!</button>
+            </div>
+
+            <div class="module-selector hidden" id="moduleSelector">
+                <button class="module-btn active" onclick="selectModule(1)">М, А</button>
+                <button class="module-btn" onclick="selectModule(2)">+ К</button>
+                <button class="module-btn" onclick="selectModule(3)">+ О</button>
+                <button class="module-btn" onclick="selectModule(4)">+ Т</button>
+                <button class="module-btn" onclick="selectModule(5)">+ Е</button>
+                <button class="module-btn" onclick="selectModule(6)">Stress Rules</button>
+            </div>
+
+            <!-- Exercise Type Selector -->
+            <div class="exercise-selector hidden" id="exerciseSelector">
+                <h4>Choose Exercise Type:</h4>
+                <div class="exercise-buttons">
+                    <button class="exercise-btn active" onclick="setExerciseType('pronunciation')">🔊 Pronunciation</button>
+                    <button class="exercise-btn hidden" id="dictationBtn" onclick="setExerciseType('dictation')">✍️ Dictation</button>
+                    <button class="exercise-btn hidden" id="recognitionBtn" onclick="setExerciseType('recognition')">🎯 Sound Recognition</button>
+                </div>
+                <p class="unlock-message hidden" id="unlockMessage">Complete all 6 modules to unlock Dictation and Sound Recognition!</p>
+            </div>
+
+            <div class="learning-area">
+                <div class="letters-introduced hidden" id="lettersIntroduced">
+                    <h4>Letters Introduced:</h4>
+                    <div class="letters" id="currentLetters">М  А</div>
+                </div>
+
+                <div class="instruction hidden" id="instructionArea">
+                    <h3>Welcome to Russian Reading!</h3>
+                    <p>Click "Start Module" to begin learning!</p>
+                </div>
+
+                <!-- Stress explanation section -->
+                <div class="stress-explanation hidden" id="stressExplanation">
+                    <h3>🎯 Russian Stress - The Secret of Russian Accent</h3>
+                    <p>Now we introduce <strong>stress marks</strong> - this is crucial for authentic Russian pronunciation!</p>
+                    <p>Russian has only <strong>one stress per word</strong>. The stressed vowel is pronounced slightly longer and clearer.</p>
+                    <p>For example: ма́ма (the first 'а' is stressed)</p>
+                    <p><strong>Important note:</strong> Stress marks (́) are only written for Russian learners. Native speakers don't write them in everyday life - they know where to stress naturally!</p>
+                    <p>If a word has only one vowel, no stress mark is needed (like кот, том).</p>
+                    <p><strong>Key rule:</strong> When 'о' is unstressed, it sounds almost like 'а'. When stressed, it sounds like 'o' in "orange".</p>
+                </div>
+
+                <div class="current-word" id="currentWord">Ready to Start</div>
+                
+                <img class="word-image hidden" id="wordImage" alt="Word illustration">
+
+                <!-- Dictation Input -->
+                <div class="hidden" id="dictationArea">
+                    <input type="text" class="dictation-input" id="dictationInput" placeholder="Type what you hear..." maxlength="20">
+                    <button class="check-answer-btn" onclick="checkDictation()">Check Answer</button>
+                </div>
+
+                <!-- Pronunciation Score -->
+                <div class="pronunciation-score hidden" id="pronunciationScore">
+                    <div>Pronunciation Accuracy</div>
+                    <div class="score-circle" id="scoreCircle">--%</div>
+                    <div id="scoreMessage">Click speak to try!</div>
+                </div>
+
+                <!-- Sound Recognition Area -->
+                <div class="hidden" id="recognitionArea">
+                    <div class="recognition-question">
+                        <h4>Which word do you hear?</h4>
+                        <div class="word-choices">
+                            <button class="choice-btn" id="choice1" onclick="selectChoice(0)">CHOICE 1</button>
+                            <button class="choice-btn" id="choice2" onclick="selectChoice(1)">CHOICE 2</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gamification Elements -->
+                <div class="achievement-popup hidden" id="achievementPopup">
+                    <div class="achievement-content">
+                        <div class="achievement-icon">🏆</div>
+                        <div class="achievement-title" id="achievementTitle">Achievement Unlocked!</div>
+                        <div class="achievement-desc" id="achievementDesc">Great job!</div>
+                    </div>
+                </div>
+
+                <div class="level-progress hidden" id="levelProgress">
+                    <div class="level-info">
+                        <span>Level <span id="currentLevel">1</span></span>
+                        <span id="levelExp">0/100 XP</span>
+                    </div>
+                    <div class="exp-bar">
+                        <div class="exp-fill" id="expFill"></div>
+                    </div>
+                </div>
+                <div class="stats-panel hidden" id="statsPanel">
+                    <h4>Your Progress</h4>
+                    <div class="stats-row">
+                        <span class="stats-label">Words Practiced:</span>
+                        <span class="stats-value" id="wordsPracticed">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Average Score:</span>
+                        <span class="stats-value" id="averageScore">--%</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Current Streak:</span>
+                        <span class="stats-value" id="currentStreak">0</span>
+                    </div>
+                </div>
+
+                <div class="controls hidden" id="controlsArea">
+                    <button class="control-btn" id="listenBtn" onclick="playCurrentWord()">
+                        🔊 Listen
+                    </button>
+                    <button class="control-btn mic-btn" id="micBtn" onclick="startRecording()" disabled>
+                        🎤 Speak
+                    </button>
+                    <button class="control-btn stop-btn hidden" id="stopBtn" onclick="stopAudio()">
+                        ⏹ Stop
+                    </button>
+                </div>
+
+                <div class="feedback hidden" id="feedback"></div>
+
+                <div class="navigation hidden" id="navigationArea">
+                    <button class="nav-btn" id="startBtn" onclick="startCurrentModule()">Start Module</button>
+                    <button class="nav-btn" id="nextBtn" onclick="nextWord()" disabled>Next Word</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentModule = 1;
+        let currentWordIndex = 0;
+        let currentAudio = null;
+        let recognition = null;
+        let isListening = false;
+        let moduleStarted = false;
+        let learningStarted = false;
+        let exerciseType = 'pronunciation';
+        let allModulesCompleted = false; // Track if modules 1-6 are complete
+        
+        // Sound Recognition variables
+        let currentChoices = [];
+        let correctChoice = 0;
+        let selectedChoice = -1;
+        
+        // Statistics and Gamification
+        let stats = {
+            wordsPracticed: 0,
+            totalScore: 0,
+            scores: [],
+            currentStreak: 0,
+            bestStreak: 0,
+            exp: 0,
+            level: 1,
+            achievements: [],
+            badges: []
+        };
+
+        // Achievement definitions
+        const achievements = {
+            firstWord: { icon: '🎯', title: 'First Step!', desc: 'Completed your first word!' },
+            streak5: { icon: '🔥', title: 'On Fire!', desc: '5 words in a row!' },
+            streak10: { icon: '⚡', title: 'Lightning Speed!', desc: '10 words in a row!' },
+            perfectModule: { icon: '🌟', title: 'Perfectionist!', desc: 'Perfect score in a module!' },
+            speedDemon: { icon: '🚀', title: 'Speed Demon!', desc: 'Completed 20 words!' },
+            moduleComplete: { icon: '🏆', title: 'Module Master!', desc: 'Completed your first module!' },
+            cometComplete: { icon: '☄️', title: 'Comet Rider!', desc: 'Mastered the КОМЕТА group!' }
+        };
+
+        // Similar word pairs for sound recognition - using all AKМOTE group words
+        const soundPairs = [
+            // Similar sounds within the group
+            ['МАК', 'МАКАКА'],
+            ['КОТ', 'ТОМ'], 
+            ['АТОМ', 'ТОМАТ'],
+            ['АКТ', 'ТАКТ'],
+            ['МЕТА', 'ТЕМА'],
+            ['МЕМ', 'МЕККА'],
+            ['МАКЕТ', 'КОМЕТА'],
+            ['КОМА', 'КАКАО'],
+            ['МОККО', 'МОТО'],
+            ['АТАКА', 'КАКАО'],
+            ['ТОМАТ', 'КОМЕТА'],
+            // Stress-based pairs for module 6
+            ['МА́МА', 'МАКА́КА'],
+            ['МЕ́ТА', 'ТЕ́МА'], 
+            ['КО́МА', 'ТОМА́Т'],
+            ['А́ТОМ', 'АТА́КА'],
+            ['МО́ТО', 'МО́ККО'],
+            // Single syllable vs multi-syllable
+            ['КОТ', 'КОМЕТА'],
+            ['МАК', 'МАКЕТ'],
+            ['ТОМ', 'ТОМАТ'],
+            ['АКТ', 'АТАКА']
+        ];
+
+        // Base URLs for GitHub content
+        const imageBaseUrl = 'https://raw.githubusercontent.com/kariwari13/russianpractice/main/images/';
+        const audioBaseUrl = 'https://raw.githubusercontent.com/kariwari13/russianpractice/main/audio/';
+
+        // Module data
+        const modules = {
+            1: {
+                letters: ['М', 'А'],
+                words: ['МАМА'],
+                instruction: "Module 1: Meet your first Russian letters М (M) and А (A). These letters look and sound very similar to English M and A!",
+                images: { 'МАМА': 'mama.jpg.png' }
+            },
+            2: {
+                letters: ['М', 'А', 'К'],
+                words: ['МАК', 'МАКАКА'],
+                instruction: "Module 2: Adding К (K). Now we can make more combinations! МАКАКА is monkey!",
+                images: { 
+                    'МАК': 'mac.jpg.png',
+                    'МАКАКА': 'monkey.jpg.png'
+                }
+            },
+            3: {
+                letters: ['М', 'А', 'К', 'О'],
+                words: ['КОМА', 'КАКАО', 'МОККО'],
+                instruction: "Module 3: Adding О (O). This Russian O sounds just like English O! КАКАО is cacao and МОККО is mocha!",
+                images: {
+                    'КАКАО': 'cacao.jpg.png'
+                }
+            },
+            4: {
+                letters: ['М', 'А', 'К', 'О', 'Т'],
+                words: ['КОТ', 'ТОМ', 'АТОМ', 'ТОМАТ', 'АТАКА', 'АКТ', 'ТАКТ', 'МОТО'],
+                instruction: "Module 4: Adding Т (T). Now we're building real words! КОТ means 'cat', ТОМ is the name 'Tom', ТОМАТ means 'tomato', АКТ means 'act', ТАКТ means 'tact', and МОТО means 'moto'.",
+                images: { 
+                    'КОТ': 'cat.jpg.png',
+                    'ТОМ': 'tom-cat.jpg.png',
+                    'ТОМАТ': 'tomat.jpg.png', 
+                    'АТОМ': 'atom.jpg.png' 
+                }
+            },
+            5: {
+                letters: ['М', 'А', 'К', 'О', 'Т', 'Е'],
+                words: ['МЕТА', 'ТЕМА', 'МЕМ', 'МЕККА', 'МАКЕТ', 'КОМЕТА'],
+                instruction: "Module 5: Adding Е (YE). Learn these advanced words! МЕМ means 'meme', МЕККА means 'Mecca', and МАКЕТ means 'maquette'.",
+                images: { 'КОМЕТА': 'comet.jpg.png' }
+            },
+            6: {
+                letters: ['М', 'А', 'К', 'О', 'Т', 'Е'],
+                words: ['МА́МА', 'МЕ́ТА', 'ТЕ́МА', 'МЕ́ККА', 'МАКЕ́Т', 'МАКА́КА', 'АТА́КА', 'КОТ', 'ТОМ', 'АКТ', 'ТАКТ', 'ТОМА́Т', 'А́ТОМ', 'КО́МА', 'МО́ТО', 'МО́ККО'],
+                instruction: "Module 6: Stress Rules. Learn how stress changes pronunciation. Words with one vowel don't need stress marks. Notice how unstressed 'о' sounds like 'а', but stressed 'о' sounds like 'o' in 'orange'.",
+                images: {}
+            }
+        };
+
+        function startLearning() {
+            learningStarted = true;
+            document.getElementById('introSection').classList.add('hidden');
+            document.getElementById('moduleSelector').classList.remove('hidden');
+            document.getElementById('exerciseSelector').classList.remove('hidden');
+            document.getElementById('lettersIntroduced').classList.remove('hidden');
+            document.getElementById('instructionArea').classList.remove('hidden');
+            document.getElementById('controlsArea').classList.remove('hidden');
+            document.getElementById('navigationArea').classList.remove('hidden');
+            document.getElementById('statsPanel').classList.remove('hidden');
+            
+            selectModule(1);
+            updateStats();
+        }
+
+        // FIXED: Simple nextWord function that tracks module completion
+        function nextWord() {
+            hideFeedback();
+            if (exerciseType === 'dictation') {
+                document.getElementById('dictationInput').value = '';
+            }
+            
+            currentWordIndex++;
+            
+            if (currentWordIndex >= modules[currentModule].words.length) {
+                // Module complete - check if there's next module
+                if (currentModule < Object.keys(modules).length) {
+                    // Go directly to next module
+                    nextModule();
+                    return;
+                } else {
+                    // All modules 1-6 complete - unlock advanced exercises
+                    allModulesCompleted = true;
+                    unlockAdvancedExercises();
+                    showFinalCompletion();
+                    moduleStarted = false;
+                    updateButtons();
+                    return;
+                }
+            }
+            
+            // Regular next word
+            updateExerciseDisplay();
+            updateButtons();
+            
+            setTimeout(() => {
+                if (exerciseType === 'pronunciation') {
+                    playCurrentWord();
+                }
+            }, 500);
+            
+            updateProgress();
+        }
+
+        function unlockAdvancedExercises() {
+            document.getElementById('dictationBtn').classList.remove('hidden');
+            document.getElementById('recognitionBtn').classList.remove('hidden');
+            document.getElementById('unlockMessage').classList.add('hidden');
+            
+            // Show achievement for completing all modules
+            showAchievement('🎓', 'All Modules Complete!', 'Dictation and Sound Recognition unlocked!');
+        }
+
+        function nextModule() {
+            if (currentModule < Object.keys(modules).length) {
+                selectModule(currentModule + 1);
+                startCurrentModule();
+            }
+        }
+
+        function showFinalCompletion() {
+            const content = document.querySelector('.learning-area');
+            const congratulations = document.createElement('div');
+            congratulations.className = 'final-message';
+            congratulations.innerHTML = `
+                <h2>🎉 Congratulations! You've completed all modules!</h2>
+                <p>You've mastered the first letter group with stress understanding!</p>
+                <p>Ready for the next letter group: <strong>False Friends (P=R, H=N, C=S, etc.)</strong></p>
+                <p>These letters look familiar but sound different - it will be fun!</p>
+                <button class="control-btn" onclick="alert('False Friends module coming soon!')" style="margin-top: 15px;">Coming Soon: False Friends</button>
+            `;
+            content.appendChild(congratulations);
+        }
+
+        // Create a virtual module 7 for advanced exercises using all AKMOTE words
+        const advancedModule = {
+            letters: ['М', 'А', 'К', 'О', 'Т', 'Е'],
+            words: ['МАМА', 'МАК', 'МАКАКА', 'КОМА', 'КАКАО', 'МОККО', 'КОТ', 'ТОМ', 'АТОМ', 'ТОМАТ', 'АТАКА', 'АКТ', 'ТАКТ', 'МОТО', 'МЕТА', 'ТЕМА', 'МЕМ', 'МЕККА', 'МАКЕТ', 'КОМЕТА'],
+            stressedWords: ['МА́МА', 'МЕ́ТА', 'ТЕ́МА', 'МЕ́ККА', 'МАКЕ́Т', 'МАКА́КА', 'АТА́КА', 'ТОМА́Т', 'А́ТОМ', 'КО́МА', 'МО́ТО', 'МО́ККО'],
+            instruction: "Advanced Practice: Use all your learned words for dictation and sound recognition exercises!",
+            images: {}
+        };
+
+        function setExerciseType(type) {
+            if ((type === 'dictation' || type === 'recognition') && !allModulesCompleted) {
+                showFeedback('Complete all 6 modules first to unlock this exercise!', 'error');
+                return;
+            }
+            
+            exerciseType = type;
+            
+            document.querySelectorAll('.exercise-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Switch to advanced module for dictation and recognition
+            if (type === 'dictation' || type === 'recognition') {
+                // Create a practice session with all words
+                currentWordIndex = 0;
+                moduleStarted = true;
+                updateAdvancedExerciseDisplay();
+            } else {
+                updateExerciseDisplay();
+            }
+            
+            updateButtons();
+        }
+
+        function updateAdvancedExerciseDisplay() {
+            const dictationArea = document.getElementById('dictationArea');
+            const pronunciationScore = document.getElementById('pronunciationScore');
+            const recognitionArea = document.getElementById('recognitionArea');
+            const currentWordEl = document.getElementById('currentWord');
+            const wordImage = document.getElementById('wordImage');
+            
+            dictationArea.classList.add('hidden');
+            pronunciationScore.classList.add('hidden');
+            recognitionArea.classList.add('hidden');
+            wordImage.classList.add('hidden');
+            
+            if (exerciseType === 'dictation') {
+                currentWordEl.textContent = '?';
+                dictationArea.classList.remove('hidden');
+                document.getElementById('dictationInput').value = '';
+            } else if (exerciseType === 'recognition') {
+                currentWordEl.textContent = 'Listen carefully...';
+                recognitionArea.classList.remove('hidden');
+                setTimeout(() => {
+                    setupAdvancedSoundRecognition();
+                }, 200);
+            }
+        }
+
+        function setupAdvancedSoundRecognition() {
+            // Use all available pairs for advanced practice
+            const allPairs = soundPairs.filter(pair => 
+                advancedModule.words.includes(pair[0]) && advancedModule.words.includes(pair[1])
+            );
+            
+            if (allPairs.length === 0) {
+                showFeedback('No sound recognition exercises available', 'error');
+                return;
+            }
+            
+            const randomPair = allPairs[Math.floor(Math.random() * allPairs.length)];
+            currentChoices = [...randomPair];
+            
+            correctChoice = Math.floor(Math.random() * 2);
+            selectedChoice = -1;
+            
+            const displayOrder = Math.random() > 0.5 ? [0, 1] : [1, 0];
+            
+            document.getElementById('choice1').textContent = currentChoices[displayOrder[0]];
+            document.getElementById('choice2').textContent = currentChoices[displayOrder[1]];
+            
+            if (displayOrder[0] === correctChoice) {
+                correctChoice = 0;
+            } else {
+                correctChoice = 1;
+            }
+            
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            setTimeout(() => {
+                const wordToPlay = correctChoice === 0 ? 
+                    document.getElementById('choice1').textContent :
+                    document.getElementById('choice2').textContent;
+                playTextToSpeech(wordToPlay);
+            }, 1000);
+        }
+
+        function updateExerciseDisplay() {
+            const dictationArea = document.getElementById('dictationArea');
+            const pronunciationScore = document.getElementById('pronunciationScore');
+            const recognitionArea = document.getElementById('recognitionArea');
+            const currentWordEl = document.getElementById('currentWord');
+            const wordImage = document.getElementById('wordImage');
+            
+            dictationArea.classList.add('hidden');
+            pronunciationScore.classList.add('hidden');
+            recognitionArea.classList.add('hidden');
+            
+            if (exerciseType === 'dictation') {
+                currentWordEl.textContent = '?';
+                wordImage.classList.add('hidden');
+                dictationArea.classList.remove('hidden');
+                document.getElementById('dictationInput').value = '';
+            } else if (exerciseType === 'pronunciation') {
+                if (moduleStarted && currentWordIndex < modules[currentModule].words.length) {
+                    displayCurrentWord();
+                }
+                pronunciationScore.classList.remove('hidden');
+            } else if (exerciseType === 'recognition') {
+                currentWordEl.textContent = 'Listen carefully...';
+                wordImage.classList.add('hidden');
+                recognitionArea.classList.remove('hidden');
+                setTimeout(() => {
+                    setupSoundRecognition();
+                }, 200);
+            }
+        }
+
+        function setupSoundRecognition() {
+            // Get all learned words from modules up to current one
+            const learnedWords = [];
+            for (let i = 1; i <= currentModule; i++) {
+                learnedWords.push(...modules[i].words);
+            }
+            
+            // For module 6 (stress rules), only use words with stress marks
+            const wordsToUse = currentModule === 6 ? 
+                learnedWords.filter(word => word.includes('́')) : 
+                learnedWords;
+            
+            // Filter sound pairs to only include appropriate words
+            const availablePairs = soundPairs.filter(pair => 
+                wordsToUse.includes(pair[0]) && wordsToUse.includes(pair[1])
+            );
+            
+            if (availablePairs.length === 0) {
+                // Fallback: create a pair from current module words
+                const currentWords = modules[currentModule].words;
+                if (currentModule === 6) {
+                    // For stress module, only use stressed words
+                    const stressedWords = currentWords.filter(word => word.includes('́'));
+                    if (stressedWords.length >= 2) {
+                        currentChoices = [stressedWords[0], stressedWords[1]];
+                    } else {
+                        showFeedback('No sound recognition exercises available yet', 'error');
+                        return;
+                    }
+                } else {
+                    if (currentWords.length >= 2) {
+                        currentChoices = [currentWords[0], currentWords[1]];
+                    } else {
+                        showFeedback('No sound recognition exercises available yet', 'error');
+                        return;
+                    }
+                }
+            } else {
+                // Select a random pair from available pairs
+                const randomPair = availablePairs[Math.floor(Math.random() * availablePairs.length)];
+                currentChoices = [...randomPair];
+            }
+            
+            // Randomly select which word to play (0 or 1)
+            correctChoice = Math.floor(Math.random() * 2);
+            selectedChoice = -1;
+            
+            // Randomly shuffle display order
+            const displayOrder = Math.random() > 0.5 ? [0, 1] : [1, 0];
+            
+            // Update button texts
+            document.getElementById('choice1').textContent = currentChoices[displayOrder[0]];
+            document.getElementById('choice2').textContent = currentChoices[displayOrder[1]];
+            
+            // Adjust correctChoice based on display order
+            if (displayOrder[0] === correctChoice) {
+                correctChoice = 0; // First button has correct answer
+            } else {
+                correctChoice = 1; // Second button has correct answer
+            }
+            
+            // Reset button styles
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Auto-play the correct word after a short delay
+            setTimeout(() => {
+                const wordToPlay = correctChoice === 0 ? 
+                    document.getElementById('choice1').textContent :
+                    document.getElementById('choice2').textContent;
+                playTextToSpeech(wordToPlay);
+            }, 1000);
+        }
+
+        function selectChoice(choiceIndex) {
+            selectedChoice = choiceIndex;
+            
+            // Reset all buttons
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Mark selected
+            if (choiceIndex === 0) {
+                document.getElementById('choice1').classList.add('selected');
+            } else {
+                document.getElementById('choice2').classList.add('selected');
+            }
+            
+            // Check answer after a short delay
+            setTimeout(() => {
+                checkSoundRecognition();
+            }, 500);
+        }
+
+        function checkSoundRecognition() {
+            const isCorrect = selectedChoice === correctChoice;
+            
+            // Show correct answer
+            if (correctChoice === 0) {
+                document.getElementById('choice1').classList.add('correct');
+                if (selectedChoice === 1) {
+                    document.getElementById('choice2').classList.add('incorrect');
+                }
+            } else {
+                document.getElementById('choice2').classList.add('correct');
+                if (selectedChoice === 0) {
+                    document.getElementById('choice1').classList.add('incorrect');
+                }
+            }
+            
+            if (isCorrect) {
+                showFeedback('Correct! Well done! 🎉', 'success');
+                addExp(15);
+                stats.currentStreak++;
+                checkAchievements();
+            } else {
+                showFeedback('Not quite right. Listen again!', 'error');
+                stats.currentStreak = 0;
+            }
+            
+            stats.wordsPracticed++;
+            updateStats();
+            
+            setTimeout(() => {
+                document.getElementById('nextBtn').disabled = false;
+            }, 1500);
+        }
+
+        // Gamification Functions
+        function addExp(points) {
+            stats.exp += points;
+            
+            const expNeeded = stats.level * 100;
+            if (stats.exp >= expNeeded) {
+                stats.level++;
+                stats.exp = stats.exp - expNeeded;
+                showAchievement('🆙', 'Level Up!', `Welcome to Level ${stats.level}!`);
+            }
+            
+            updateLevelDisplay();
+        }
+
+        function updateLevelDisplay() {
+            document.getElementById('currentLevel').textContent = stats.level;
+            const expNeeded = stats.level * 100;
+            document.getElementById('levelExp').textContent = `${stats.exp}/${expNeeded} XP`;
+            
+            const expPercent = (stats.exp / expNeeded) * 100;
+            document.getElementById('expFill').style.width = expPercent + '%';
+        }
+
+        function showAchievement(icon, title, description) {
+            const popup = document.getElementById('achievementPopup');
+            document.getElementById('achievementTitle').textContent = title;
+            document.getElementById('achievementDesc').textContent = description;
+            popup.querySelector('.achievement-icon').textContent = icon;
+            
+            popup.classList.remove('hidden');
+            
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 3000);
+        }
+
+        function checkAchievements() {
+            // First word achievement
+            if (stats.wordsPracticed === 1 && !stats.achievements.includes('firstWord')) {
+                stats.achievements.push('firstWord');
+                showAchievement(achievements.firstWord.icon, achievements.firstWord.title, achievements.firstWord.desc);
+                addExp(25);
+            }
+            
+            // Streak achievements
+            if (stats.currentStreak === 5 && !stats.achievements.includes('streak5')) {
+                stats.achievements.push('streak5');
+                stats.badges.push('🔥 Fire Streak');
+                showAchievement(achievements.streak5.icon, achievements.streak5.title, achievements.streak5.desc);
+                addExp(50);
+            }
+            
+            if (stats.currentStreak === 10 && !stats.achievements.includes('streak10')) {
+                stats.achievements.push('streak10');
+                stats.badges.push('⚡ Lightning Fast');
+                showAchievement(achievements.streak10.icon, achievements.streak10.title, achievements.streak10.desc);
+                addExp(100);
+            }
+            
+            // Speed achievement
+            if (stats.wordsPracticed === 20 && !stats.achievements.includes('speedDemon')) {
+                stats.achievements.push('speedDemon');
+                stats.badges.push('🚀 Speed Master');
+                showAchievement(achievements.speedDemon.icon, achievements.speedDemon.title, achievements.speedDemon.desc);
+                addExp(75);
+            }
+            
+            // Update stats display with best streak
+            if (stats.currentStreak > stats.bestStreak) {
+                stats.bestStreak = stats.currentStreak;
+            }
+        }
+
+        // Audio management
+        function stopCurrentAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+            }
+            hideStopButton();
+        }
+
+        function showStopButton() {
+            document.getElementById('stopBtn').classList.remove('hidden');
+        }
+
+        function hideStopButton() {
+            document.getElementById('stopBtn').classList.add('hidden');
+        }
+
+        function stopAudio() {
+            stopCurrentAudio();
+        }
+
+        async function playTextToSpeech(text) {
+            try {
+                stopCurrentAudio();
+                showStopButton();
+                
+                const cleanText = text.replace(/́/g, '').toLowerCase();
+                const audioUrl = `${audioBaseUrl}${cleanText}.mp3`;
+                console.log(`Trying to play audio: ${audioUrl}`);
+                
+                await playCustomAudio(audioUrl, text);
+                
+            } catch (error) {
+                console.error('Audio playback error:', error);
+                await playWebSpeechTTS(text);
+            }
+        }
+
+        async function playCustomAudio(audioUrl, text) {
+            return new Promise((resolve, reject) => {
+                console.log(`Playing custom audio for: ${text}`);
+                
+                currentAudio = new Audio(audioUrl);
+                
+                currentAudio.onloadeddata = () => {
+                    console.log(`Custom audio loaded: ${text}`);
+                };
+                
+                currentAudio.onended = () => {
+                    console.log(`Custom audio ended: ${text}`);
+                    hideStopButton();
+                    resolve();
+                };
+                
+                currentAudio.onerror = (e) => {
+                    console.error(`Custom audio error for ${text}:`, e);
+                    hideStopButton();
+                    playWebSpeechTTS(text).then(resolve).catch(reject);
+                };
+                
+                currentAudio.play().catch((playError) => {
+                    console.error(`Audio play error for ${text}:`, playError);
+                    hideStopButton();
+                    playWebSpeechTTS(text).then(resolve).catch(reject);
+                });
+            });
+        }
+
+        async function playWebSpeechTTS(text) {
+            try {
+                if (!('speechSynthesis' in window)) {
+                    throw new Error('Speech synthesis not supported');
+                }
+
+                speechSynthesis.cancel();
+
+                await new Promise((resolve) => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        resolve();
+                    } else {
+                        const loadVoices = () => {
+                            if (speechSynthesis.getVoices().length > 0) {
+                                speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+                                resolve();
+                            }
+                        };
+                        speechSynthesis.addEventListener('voiceschanged', loadVoices);
+                        setTimeout(resolve, 1000);
+                    }
+                });
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                utterance.lang = 'ru-RU';
+                utterance.rate = 0.8;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                const voices = speechSynthesis.getVoices();
+                const russianVoices = voices.filter(voice => 
+                    voice.lang === 'ru-RU' ||
+                    voice.lang.startsWith('ru-') ||
+                    voice.name.toLowerCase().includes('russian')
+                );
+                
+                const selectedVoice = russianVoices.find(v => 
+                    v.name.toLowerCase().includes('google')
+                ) || russianVoices[0];
+                
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    console.log('Using Web Speech fallback voice:', selectedVoice.name);
+                }
+
+                utterance.onstart = () => console.log('Web Speech fallback started');
+                utterance.onend = () => {
+                    console.log('Web Speech fallback ended');
+                    hideStopButton();
+                };
+                utterance.onerror = (event) => {
+                    if (event.error !== 'interrupted') {
+                        console.error('Web Speech fallback error:', event.error);
+                    }
+                    hideStopButton();
+                };
+
+                currentAudio = {
+                    pause: () => {
+                        speechSynthesis.cancel();
+                        hideStopButton();
+                    },
+                    paused: false
+                };
+
+                speechSynthesis.speak(utterance);
+
+            } catch (error) {
+                console.error('Web Speech fallback error:', error);
+                hideStopButton();
+                throw error;
+            }
+        }
+
+        // Speech recognition
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ru-RU';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    const micBtn = document.getElementById('micBtn');
+                    micBtn.classList.add('listening');
+                    micBtn.textContent = '🎤 Listening...';
+                    showFeedback('Speak now...', 'info');
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    console.log('Recognized:', transcript);
+                    
+                    if (exerciseType === 'pronunciation') {
+                        const currentWord = modules[currentModule].words[currentWordIndex];
+                        const score = calculatePronunciationScore(transcript, currentWord);
+                        showPronunciationScore(score, transcript, currentWord);
+                        showFeedback(`You said: "${transcript}"`, score >= 70 ? 'success' : 'error');
+                    } else {
+                        showFeedback(`You said: ${transcript}`, 'success');
+                        setTimeout(() => {
+                            playCorrectPronunciation();
+                        }, 1000);
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    showFeedback('Could not recognize speech. Try again.', 'error');
+                    stopListening();
+                };
+
+                recognition.onend = () => {
+                    stopListening();
+                };
+            }
+        }
+
+        function startRecording() {
+            if (!recognition) {
+                showFeedback('Speech recognition not available', 'error');
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+                return;
+            }
+
+            try {
+                // Reset recognition state before starting
+                recognition.abort(); // Stop any previous recognition
+                setTimeout(() => {
+                    recognition.start();
+                }, 100);
+            } catch (error) {
+                console.error('Recognition start error:', error);
+                showFeedback('Could not start recording', 'error');
+            }
+        }
+
+        function stopListening() {
+            isListening = false;
+            const micBtn = document.getElementById('micBtn');
+            micBtn.classList.remove('listening');
+            micBtn.textContent = '🎤 Speak';
+            
+            // Re-enable mic button for next use
+            setTimeout(() => {
+                micBtn.disabled = false;
+            }, 500);
+            
+            hideFeedback();
+        }
+
+        function playCorrectPronunciation() {
+            const currentWord = modules[currentModule].words[currentWordIndex];
+            playTextToSpeech(currentWord).then(() => {
+                setTimeout(() => {
+                    document.getElementById('nextBtn').disabled = false;
+                }, 1000);
+            });
+        }
+
+        function calculatePronunciationScore(spoken, target) {
+            const spokenClean = spoken.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '');
+            const targetClean = target.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '');
+            
+            if (spokenClean === targetClean) return 100;
+            
+            const matrix = [];
+            const n = spokenClean.length;
+            const m = targetClean.length;
+            
+            for (let i = 0; i <= n; i++) {
+                matrix[i] = [i];
+            }
+            for (let j = 0; j <= m; j++) {
+                matrix[0][j] = j;
+            }
+            
+            for (let i = 1; i <= n; i++) {
+                for (let j = 1; j <= m; j++) {
+                    if (spokenClean.charAt(i - 1) === targetClean.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+                    }
+                }
+            }
+            
+            const maxLen = Math.max(n, m);
+            if (maxLen === 0) return 100;
+            
+            const similarity = ((maxLen - matrix[n][m]) / maxLen) * 100;
+            return Math.max(0, Math.round(similarity));
+        }
+
+        function startLearning() {
+            learningStarted = true;
+            document.getElementById('introSection').classList.add('hidden');
+            document.getElementById('moduleSelector').classList.remove('hidden');
+            document.getElementById('exerciseSelector').classList.remove('hidden');
+            document.getElementById('lettersIntroduced').classList.remove('hidden');
+            document.getElementById('instructionArea').classList.remove('hidden');
+            document.getElementById('controlsArea').classList.remove('hidden');
+            document.getElementById('navigationArea').classList.remove('hidden');
+            document.getElementById('statsPanel').classList.remove('hidden');
+            document.getElementById('levelProgress').classList.remove('hidden');
+            
+            // Show unlock message initially
+            document.getElementById('unlockMessage').classList.remove('hidden');
+            
+            selectModule(1);
+            updateStats();
+            updateLevelDisplay();
+        }
+
+        function showPronunciationScore(score, spoken, target) {
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreMessage = document.getElementById('scoreMessage');
+            
+            scoreCircle.textContent = score + '%';
+            
+            if (score >= 90) {
+                scoreMessage.textContent = 'Perfect! 🌟';
+                scoreCircle.style.borderColor = '#28a745';
+                addExp(25);
+            } else if (score >= 70) {
+                scoreMessage.textContent = 'Good job! 👍';
+                scoreCircle.style.borderColor = '#ffc107';
+                addExp(15);
+            } else if (score >= 50) {
+                scoreMessage.textContent = 'Keep trying! 💪';
+                scoreCircle.style.borderColor = '#fd7e14';
+                addExp(5);
+            } else {
+                scoreMessage.textContent = 'Try again! 🔄';
+                scoreCircle.style.borderColor = '#dc3545';
+            }
+            
+            stats.scores.push(score);
+            stats.wordsPracticed++;
+            stats.totalScore += score;
+            
+            if (score >= 70) {
+                stats.currentStreak++;
+                stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+            } else {
+                stats.currentStreak = 0;
+            }
+            
+            checkAchievements();
+            updateStats();
+            
+            if (score >= 70) {
+                setTimeout(() => {
+                    document.getElementById('nextBtn').disabled = false;
+                }, 1500);
+            }
+        }
+
+        function checkDictation() {
+            const userInput = document.getElementById('dictationInput').value.trim().toUpperCase();
+            const correctWord = modules[currentModule].words[currentWordIndex];
+            const correctWordClean = correctWord.replace(/́/g, '');
+            
+            if (userInput === correctWordClean) {
+                showFeedback(`Correct! The word was: ${correctWord}`, 'success');
+                stats.currentStreak++;
+                addExp(20);
+                setTimeout(() => {
+                    document.getElementById('nextBtn').disabled = false;
+                }, 1500);
+            } else {
+                showFeedback(`Try again! You wrote: "${userInput}"`, 'error');
+                stats.currentStreak = 0;
+                setTimeout(() => {
+                    document.getElementById('dictationInput').value = '';
+                    document.getElementById('dictationInput').focus();
+                }, 1500);
+            }
+            
+            stats.wordsPracticed++;
+            checkAchievements();
+            updateStats();
+        }
+
+        function playCurrentWord() {
+            if (exerciseType === 'dictation' && allModulesCompleted) {
+                // Advanced dictation mode - use random word from all learned words
+                const randomWord = advancedModule.words[Math.floor(Math.random() * advancedModule.words.length)];
+                document.getElementById('currentWord').textContent = '?';
+                document.getElementById('wordImage').classList.add('hidden');
+                playTextToSpeech(randomWord);
+                document.getElementById('dictationInput').focus();
+                // Store the current word for checking
+                window.currentDictationWord = randomWord;
+                return;
+            } else if (exerciseType === 'recognition' && allModulesCompleted) {
+                // Advanced sound recognition - replay current audio
+                if (currentChoices.length > 0) {
+                    const wordToPlay = correctChoice === 0 ? 
+                        document.getElementById('choice1').textContent :
+                        document.getElementById('choice2').textContent;
+                    playTextToSpeech(wordToPlay);
+                }
+                return;
+            }
+            
+            // Regular pronunciation mode for modules 1-6
+            if (!moduleStarted || currentWordIndex >= modules[currentModule].words.length) {
+                return;
+            }
+            
+            const word = modules[currentModule].words[currentWordIndex];
+            displayCurrentWord();
+            playTextToSpeech(word);
+            
+            setTimeout(() => {
+                if (exerciseType === 'pronunciation') {
+                    document.getElementById('micBtn').disabled = false;
+                }
+            }, 1000);
+        }
+
+        function checkDictation() {
+            const userInput = document.getElementById('dictationInput').value.trim().toUpperCase();
+            
+            let correctWord;
+            if (allModulesCompleted && exerciseType === 'dictation') {
+                // Advanced dictation mode
+                correctWord = window.currentDictationWord;
+            } else {
+                // Regular module-based dictation
+                correctWord = modules[currentModule].words[currentWordIndex];
+            }
+            
+            const correctWordClean = correctWord.replace(/́/g, '');
+            
+            if (userInput === correctWordClean) {
+                showFeedback(`Correct! The word was: ${correctWord}`, 'success');
+                stats.currentStreak++;
+                addExp(20);
+                
+                if (allModulesCompleted) {
+                    // In advanced mode, generate new word automatically
+                    setTimeout(() => {
+                        const newRandomWord = advancedModule.words[Math.floor(Math.random() * advancedModule.words.length)];
+                        document.getElementById('dictationInput').value = '';
+                        window.currentDictationWord = newRandomWord;
+                        playTextToSpeech(newRandomWord);
+                        document.getElementById('dictationInput').focus();
+                        hideFeedback();
+                    }, 2000);
+                } else {
+                    setTimeout(() => {
+                        document.getElementById('nextBtn').disabled = false;
+                    }, 1500);
+                }
+            } else {
+                showFeedback(`Try again! You wrote: "${userInput}"`, 'error');
+                stats.currentStreak = 0;
+                setTimeout(() => {
+                    document.getElementById('dictationInput').value = '';
+                    document.getElementById('dictationInput').focus();
+                }, 1500);
+            }
+            
+            stats.wordsPracticed++;
+            checkAchievements();
+            updateStats();
+        }
+
+        function updateButtons() {
+            const startBtn = document.getElementById('startBtn');
+            const listenBtn = document.getElementById('listenBtn');
+            const micBtn = document.getElementById('micBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (!moduleStarted) {
+                startBtn.disabled = false;
+                startBtn.textContent = 'Start Module';
+                listenBtn.disabled = true;
+                micBtn.disabled = true;
+                nextBtn.disabled = true;
+            } else if (currentWordIndex >= modules[currentModule].words.length) {
+                startBtn.disabled = false;
+                startBtn.textContent = 'Restart Module';
+                listenBtn.disabled = true;
+                micBtn.disabled = true;
+                nextBtn.disabled = true;
+            } else {
+                startBtn.disabled = true;
+                
+                if (exerciseType === 'recognition') {
+                    listenBtn.disabled = false;
+                    micBtn.disabled = true;
+                    nextBtn.disabled = true; // Will be enabled after answer
+                } else {
+                    listenBtn.disabled = false;
+                    
+                    if (exerciseType === 'pronunciation') {
+                        micBtn.disabled = true;
+                    } else if (exerciseType === 'dictation') {
+                        micBtn.disabled = true;
+                    } else {
+                        micBtn.disabled = true;
+                    }
+                    
+                    nextBtn.disabled = exerciseType === 'dictation' ? true : false;
+                }
+            }
+            
+            if (exerciseType === 'dictation') {
+                listenBtn.textContent = '🔊 Play Word';
+            } else if (exerciseType === 'recognition') {
+                listenBtn.textContent = '🔊 Replay';
+            } else {
+                listenBtn.textContent = '🔊 Listen';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('wordsPracticed').textContent = stats.wordsPracticed;
+            
+            const avgScore = stats.scores.length > 0 
+                ? Math.round(stats.totalScore / stats.scores.length)
+                : 0;
+            document.getElementById('averageScore').textContent = avgScore + '%';
+            document.getElementById('currentStreak').textContent = stats.currentStreak;
+        }
+
+        function selectModule(moduleNum) {
+            currentModule = moduleNum;
+            currentWordIndex = 0;
+            moduleStarted = false;
+            
+            document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.module-btn')[moduleNum - 1].classList.add('active');
+            
+            updateLettersDisplay();
+            updateInstructionArea();
+            resetWordDisplay();
+            updateButtons();
+            updateProgress();
+            updateExerciseDisplay();
+            
+            if (moduleNum === 6) {
+                document.getElementById('stressExplanation').classList.remove('hidden');
+            } else {
+                document.getElementById('stressExplanation').classList.add('hidden');
+            }
+        }
+
+        function startCurrentModule() {
+            moduleStarted = true;
+            currentWordIndex = 0;
+            
+            updateInstructionArea();
+            
+            setTimeout(() => {
+                updateExerciseDisplay();
+                updateButtons();
+            }, 500);
+        }
+
+        function displayCurrentWord() {
+            const word = modules[currentModule].words[currentWordIndex];
+            document.getElementById('currentWord').textContent = word;
+            
+            const wordImage = document.getElementById('wordImage');
+            if (modules[currentModule].images[word]) {
+                wordImage.src = imageBaseUrl + modules[currentModule].images[word];
+                wordImage.classList.remove('hidden');
+                
+                wordImage.onerror = () => {
+                    console.log('Image failed to load:', imageBaseUrl + modules[currentModule].images[word]);
+                    wordImage.classList.add('hidden');
+                };
+            } else {
+                wordImage.classList.add('hidden');
+            }
+        }
+
+        function playCurrentWord() {
+            if (!moduleStarted || currentWordIndex >= modules[currentModule].words.length) {
+                return;
+            }
+            
+            const word = modules[currentModule].words[currentWordIndex];
+            
+            if (exerciseType === 'dictation') {
+                document.getElementById('currentWord').textContent = '?';
+                document.getElementById('wordImage').classList.add('hidden');
+                playTextToSpeech(word);
+                document.getElementById('dictationInput').focus();
+            } else {
+                displayCurrentWord();
+                playTextToSpeech(word);
+            }
+            
+            setTimeout(() => {
+                if (exerciseType === 'pronunciation') {
+                    document.getElementById('micBtn').disabled = false;
+                }
+            }, 1000);
+        }
+
+        function updateLettersDisplay() {
+            document.getElementById('currentLetters').textContent = modules[currentModule].letters.join('  ');
+        }
+
+        function updateInstructionArea() {
+            const instruction = document.getElementById('instructionArea');
+            instruction.querySelector('h3').textContent = `Module ${currentModule}`;
+            instruction.querySelector('p').textContent = modules[currentModule].instruction;
+        }
+
+        function resetWordDisplay() {
+            document.getElementById('currentWord').textContent = 'Ready to Start';
+            document.getElementById('wordImage').classList.add('hidden');
+            hideFeedback();
+        }
+
+        function updateButtons() {
+            const startBtn = document.getElementById('startBtn');
+            const listenBtn = document.getElementById('listenBtn');
+            const micBtn = document.getElementById('micBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (!moduleStarted) {
+                startBtn.disabled = false;
+                startBtn.textContent = 'Start Module';
+                listenBtn.disabled = true;
+                micBtn.disabled = true;
+                nextBtn.disabled = true;
+            } else if (currentWordIndex >= modules[currentModule].words.length) {
+                startBtn.disabled = false;
+                startBtn.textContent = 'Restart Module';
+                listenBtn.disabled = true;
+                micBtn.disabled = true;
+                nextBtn.disabled = true;
+            } else {
+                startBtn.disabled = true;
+                listenBtn.disabled = false;
+                
+                if (exerciseType === 'pronunciation') {
+                    micBtn.disabled = true;
+                } else if (exerciseType === 'dictation') {
+                    micBtn.disabled = true;
+                } else {
+                    micBtn.disabled = true;
+                }
+                
+                nextBtn.disabled = exerciseType === 'dictation' ? true : false;
+            }
+            
+            if (exerciseType === 'dictation') {
+                listenBtn.textContent = '🔊 Play Word';
+            } else {
+                listenBtn.textContent = '🔊 Listen';
+            }
+        }
+
+        function updateProgress() {
+            if (!moduleStarted) {
+                document.getElementById('progressFill').style.width = '0%';
+                return;
+            }
+            
+            const totalWords = modules[currentModule].words.length;
+            const progress = (currentWordIndex / totalWords) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            feedback.classList.remove('hidden');
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.add('hidden');
+        }
+
+        // Keyboard support for dictation
+        document.addEventListener('keydown', function(event) {
+            if (exerciseType === 'dictation' && event.key === 'Enter') {
+                const dictationInput = document.getElementById('dictationInput');
+                if (document.activeElement === dictationInput && dictationInput.value.trim() !== '') {
+                    checkDictation();
+                }
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initSpeechRecognition();
+            console.log('Russian Learning Platform initialized - Fixed Navigation');
+            
+            document.addEventListener('click', function() {
+                if (currentAudio && currentAudio.paused) {
+                    hideStopButton();
+                }
+            });
+        });
+
+        window.addEventListener('beforeunload', function() {
+            stopCurrentAudio();
+        });
+    </script>
+</body>
+</html>
