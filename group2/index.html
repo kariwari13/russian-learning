@@ -588,11 +588,6 @@
             </div>
 
             <div class="learning-area">
-                <div class="letters-introduced hidden" id="lettersIntroduced">
-                    <h4>Letters Introduced:</h4>
-                    <div class="letters" id="currentLetters">Р</div>
-                </div>
-
                 <div class="instruction hidden" id="instructionArea">
                     <h3>Р</h3>
                     <p>Р (pink like rose) = R sound (like 'r' in 'rose'). Don't be fooled - it looks like P but sounds like R! Memory trick: pink Rose = R sound.</p>
@@ -758,7 +753,6 @@
             learningStarted = true;
             document.getElementById('introSection').classList.add('hidden');
             document.getElementById('moduleSelector').classList.remove('hidden');
-            document.getElementById('lettersIntroduced').classList.remove('hidden');
             document.getElementById('instructionArea').classList.remove('hidden');
             document.getElementById('controlsArea').classList.remove('hidden');
             document.getElementById('navigationArea').classList.remove('hidden');
@@ -1251,7 +1245,6 @@
             document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.module-btn')[moduleNum - 1].classList.add('active');
             
-            updateLettersDisplay();
             updateInstructionArea();
             showLetterImage();
             resetWordDisplay();
@@ -1284,23 +1277,6 @@
                                 .replace(/В/g, '<span class="letter-v">В</span>');
             
             wordElement.innerHTML = styledWord;
-        }
-
-        function updateLettersDisplay() {
-            const lettersElement = document.getElementById('currentLetters');
-            const letters = modules[currentModule].letters;
-            
-            let lettersHTML = letters.map(letter => {
-                if (letter === 'Р') {
-                    return `<span class="letter-p">${letter}</span>`;
-                } else if (letter === 'В') {
-                    return `<span class="letter-v">${letter}</span>`;
-                } else {
-                    return letter;
-                }
-            }).join('  ');
-            
-            lettersElement.innerHTML = lettersHTML;
         }
 
         function updateInstructionArea() {
