@@ -927,13 +927,47 @@
                 showStopButton();
                 
                 const cleanText = text.replace(/́/g, '').toLowerCase();
+                const audioBaseUrl = 'https://raw.githubusercontent.com/kariwari13/russian-learning/main/audio/';
+                const audioUrl = `${audioBaseUrl}${cleanText}.mp3`;
                 
-                await playWebSpeechTTS(text);
+                console.log(`Trying to play audio: ${audioUrl}`);
+                
+                await playCustomAudio(audioUrl, text);
                 
             } catch (error) {
                 console.error('Audio playback error:', error);
                 await playWebSpeechTTS(text);
             }
+        }
+
+        async function playCustomAudio(audioUrl, text) {
+            return new Promise((resolve, reject) => {
+                console.log(`Playing custom audio for: ${text}`);
+                
+                currentAudio = new Audio(audioUrl);
+                
+                currentAudio.onloadeddata = () => {
+                    console.log(`Custom audio loaded: ${text}`);
+                };
+                
+                currentAudio.onended = () => {
+                    console.log(`Custom audio ended: ${text}`);
+                    hideStopButton();
+                    resolve();
+                };
+                
+                currentAudio.onerror = (e) => {
+                    console.error(`Custom audio error for ${text}:`, e);
+                    hideStopButton();
+                    playWebSpeechTTS(text).then(resolve).catch(reject);
+                };
+                
+                currentAudio.play().catch((playError) => {
+                    console.error(`Audio play error for ${text}:`, playError);
+                    hideStopButton();
+                    playWebSpeechTTS(text).then(resolve).catch(reject);
+                });
+            });
         }
 
         async function playWebSpeechTTS(text) {
