@@ -63,6 +63,25 @@
             margin-bottom: 10px;
         }
 
+        .letter-correspondences {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .letter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .letter-group.center {
+            text-align: center;
+        }
+
         .progress-bar {
             background: rgba(255,255,255,0.3);
             height: 8px;
@@ -415,9 +434,15 @@
             border: 1px solid #f5c6cb;
         }
 
+        .feedback.info {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #99ccff;
+        }
+
         .navigation {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             margin-top: 30px;
         }
 
@@ -520,6 +545,23 @@
             </div>
             <h1>Group 2: False Friends</h1>
             <p>Letters that look familiar but sound different</p>
+            
+            <div class="letter-correspondences">
+                <div class="letter-group">
+                    <span>Р = R</span>
+                    <span>В = V</span>
+                </div>
+                <div class="letter-group center">
+                    <span>Н = N</span>
+                    <span>С = S</span>
+                    <span>И = I</span>
+                </div>
+                <div class="letter-group">
+                    <span>У = U</span>
+                    <span>Х = H</span>
+                </div>
+            </div>
+            
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
@@ -552,8 +594,8 @@
                 </div>
 
                 <div class="instruction hidden" id="instructionArea">
-                    <h3>🚀 Learn False Friends the Smart Way!</h3>
-                    <p>Learning to read Russian isn't difficult when you follow the right method given on this platform.</p>
+                    <h3>Р</h3>
+                    <p>Р (pink like rose) = R sound (like 'r' in 'rose'). Don't be fooled - it looks like P but sounds like R! Memory trick: pink Rose = R sound.</p>
                 </div>
 
                 <img class="word-image hidden" id="letterImage" alt="Letter illustration">
@@ -618,6 +660,7 @@
                 <div class="feedback hidden" id="feedback"></div>
 
                 <div class="navigation hidden" id="navigationArea">
+                    <button class="nav-btn" id="prevBtn" onclick="prevWord()" disabled>Previous Word</button>
                     <button class="nav-btn" id="nextBtn" onclick="nextWord()" disabled>Next Word</button>
                 </div>
             </div>
@@ -658,54 +701,54 @@
             falseFriendsComplete: { icon: '⚠️', title: 'False Friends Master!', desc: 'Mastered the False Friends group!' }
         };
 
-        // Module data for False Friends
+        // Module data for False Friends with correct instructions
         const modules = {
             1: {
                 letters: ['Р'],
                 words: ['МОТО́Р', 'МА́РКА', 'КРЕМ', 'КА́МЕРА', 'АРОМА́Т', 'МЕТР', 'РОМ', 'КА́РТА', 'ТЕА́ТР', 'МЕТРО́', 'РАКЕ́ТА', 'СЕ́КТОР'],
-                instruction: "Module 1: Р (pink like rose) = R sound. Don't be fooled - it looks like P but sounds like R!",
+                instruction: "Р (pink like rose) = R sound (like 'r' in 'rose'). Don't be fooled - it looks like P but sounds like R! Memory trick: pink Rose = R sound.",
                 images: {},
                 letterImage: 'буква%20Р.png'
             },
             2: {
                 letters: ['Р', 'В'],
                 words: ['АВТОМА́Т', 'ВИ́РУС', 'КВЕСТ', 'ВИНО́', 'НЕРВ', 'А́ВТОР', 'ВЕ́КТОР', 'Е́ВРО', 'ВИТАМИ́Н', 'АКТИ́В', 'СЕ́РВИС', 'ВАКУУ́М'],
-                instruction: "Module 2: Adding В (violet) = V sound. В looks like B but sounds like V!",
+                instruction: "В (violet) = V sound. В violently divided violin - the emotion helps remember V sound! This letter appears in violet color in all words to reinforce the memory.",
                 images: {},
                 letterImage: 'буква%20В.png'
             },
             3: {
                 letters: ['Р', 'В', 'Н'],
                 words: ['ТАНК', 'МОМЕ́НТ', 'МАНЕКЕ́Н', 'АНКЕ́ТА', 'ТОН', 'АНТЕ́ННА', 'КОНТА́КТ', 'ТО́ННА', 'КОНТРА́КТ', 'ТРЕ́НЕР'],
-                instruction: "Module 3: Adding Н = N sound. Н looks like football goals - think 'Net!' when scored.",
+                instruction: "Н = N sound. Н looks like football goals (see the image) - imagine shouting 'NO!' when opponent scores. Goals shape + 'NO!' emotion + нет means 'no' = N sound.",
                 images: {},
                 letterImage: 'буква%20Н.png'
             },
             4: {
                 letters: ['Р', 'В', 'Н', 'С'],
                 words: ['КО́СМОС', 'МА́СКА', 'ТЕСТ', 'ТЕКСТ', 'А́СТМА', 'СТРЕСС', 'КОНТЕ́КСТ', 'МА́СТЕР', 'РЕСТОРА́Н', 'ОРКЕ́СТР'],
-                instruction: "Module 4: Adding С = S sound. С is shaped like a snake - makes 'ssss' sound.",
+                instruction: "С = S sound. С shaped like snake - hear the snake's 'hissss' sound. Snake shape = S sound.",
                 images: {},
                 letterImage: 'буква%20С.png'
             },
             5: {
                 letters: ['Р', 'В', 'Н', 'С', 'И'],
                 words: ['МИКРО́Н', 'КОМИТЕ́Т', 'ТО́КИО', 'МАТЕМАТИ́КА', 'АССИСТЕ́НТ', 'МЕ́КСИКА', 'ИНТЕРЕ́С', 'КЕРОСИ́Н', 'МОНИ́ТОР', 'РИТМ'],
-                instruction: "Module 5: Adding И = I sound. И looks like books (two standing, one across) - think 'image'.",
+                instruction: "И = I sound. И looks like books - imagine this image in your mind (focus on 'i' sounds). Imagine this Image = I sound.",
                 images: {},
                 letterImage: 'буква%20И.png'
             },
             6: {
                 letters: ['Р', 'В', 'Н', 'С', 'И', 'У'],
-                words: ['САКУ́РА', 'АКСЕССУА́Р', 'ИНСТИТУ́Т', 'НОТА́РИУС', 'СИ́НУС', 'ТУР', 'ТАТУ́', 'АКУ́СТИКА', 'КОНТУ́Р', 'ТУРИ́СТ'],
-                instruction: "Module 6: Adding У = U sound. У looks like a slingshot - think 'shoot' sound.",
+                words: ['СА́КУРА', 'АКСЕССУА́Р', 'ИНСТИТУ́Т', 'НОТА́РИУС', 'СИ́НУС', 'ТУР', 'ТАТУ́', 'АКУ́СТИКА', 'КОНТУ́Р', 'ТУРИ́СТ'],
+                instruction: "У = U sound (like 'oo' in 'shoot'). У looks like slingshot - focus on the 'oo' sound in 'shoot'! Slingshot = shoot = У sound.",
                 images: {},
                 letterImage: 'буква%20У.png'
             },
             7: {
                 letters: ['Р', 'В', 'Н', 'С', 'И', 'У', 'Х'],
                 words: ['ТЕ́ХНИКА', 'ХРОМ', 'ХА́ОС', 'ХРОНО́МЕТР', 'МОНА́РХ', 'АРХИ́В', 'ХИТ', 'ХИМЕ́РА', 'ХА́КЕР', 'ХАРА́КТЕР'],
-                instruction: "Module 7: Adding Х = H sound. Х is the cross you put 'HERE' - sign here!",
+                instruction: "Х = H sound (like 'h' in 'here'). Х is the cross you put 'HERE' - sign here! X marks = HERE = H sound.",
                 images: {},
                 letterImage: 'буква%20Х.png'
             }
@@ -727,19 +770,26 @@
             updateLevelDisplay();
         }
 
+        function prevWord() {
+            if (currentWordIndex > 0) {
+                hideFeedback();
+                currentWordIndex--;
+                updateExerciseDisplay();
+                updateButtons();
+                updateProgress();
+            }
+        }
+
         function nextWord() {
             hideFeedback();
             
             currentWordIndex++;
             
             if (currentWordIndex >= modules[currentModule].words.length) {
-                // Module complete - check if there's next module
                 if (currentModule < Object.keys(modules).length) {
-                    // Go directly to next module
                     nextModule();
                     return;
                 } else {
-                    // All modules complete
                     showFinalCompletion();
                     moduleStarted = false;
                     updateButtons();
@@ -747,7 +797,6 @@
                 }
             }
             
-            // Regular next word
             updateExerciseDisplay();
             updateButtons();
             updateProgress();
@@ -779,12 +828,10 @@
             
             if (moduleStarted && currentWordIndex < modules[currentModule].words.length) {
                 displayCurrentWord();
-                // Enable microphone immediately when word is displayed
                 document.getElementById('micBtn').disabled = false;
             }
         }
 
-        // Gamification Functions
         function addExp(points) {
             stats.exp += points;
             
@@ -821,14 +868,12 @@
         }
 
         function checkAchievements() {
-            // First word achievement
             if (stats.wordsPracticed === 1 && !stats.achievements.includes('firstWord')) {
                 stats.achievements.push('firstWord');
                 showAchievement(achievements.firstWord.icon, achievements.firstWord.title, achievements.firstWord.desc);
                 addExp(25);
             }
             
-            // Streak achievements
             if (stats.currentStreak === 5 && !stats.achievements.includes('streak5')) {
                 stats.achievements.push('streak5');
                 stats.badges.push('🔥 Fire Streak');
@@ -843,7 +888,6 @@
                 addExp(100);
             }
             
-            // Speed achievement
             if (stats.wordsPracticed === 20 && !stats.achievements.includes('speedDemon')) {
                 stats.achievements.push('speedDemon');
                 stats.badges.push('🚀 Speed Master');
@@ -851,13 +895,11 @@
                 addExp(75);
             }
             
-            // Update stats display with best streak
             if (stats.currentStreak > stats.bestStreak) {
                 stats.bestStreak = stats.currentStreak;
             }
         }
 
-        // Audio management
         function stopCurrentAudio() {
             if (currentAudio) {
                 currentAudio.pause();
@@ -970,7 +1012,6 @@
             }
         }
 
-        // Speech recognition
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1137,19 +1178,23 @@
             const listenBtn = document.getElementById('listenBtn');
             const micBtn = document.getElementById('micBtn');
             const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
             
             if (!moduleStarted) {
                 listenBtn.disabled = true;
                 micBtn.disabled = true;
                 nextBtn.disabled = true;
+                prevBtn.disabled = true;
             } else if (currentWordIndex >= modules[currentModule].words.length) {
                 listenBtn.disabled = true;
                 micBtn.disabled = true;
                 nextBtn.disabled = true;
+                prevBtn.disabled = currentWordIndex === 0;
             } else {
                 listenBtn.disabled = false;
                 micBtn.disabled = false;
                 nextBtn.disabled = false;
+                prevBtn.disabled = currentWordIndex === 0;
                 listenBtn.textContent = '🔊 Listen';
             }
         }
@@ -1201,7 +1246,6 @@
             const word = modules[currentModule].words[currentWordIndex];
             const wordElement = document.getElementById('currentWord');
             
-            // Apply color styling to Р and В in words
             let styledWord = word.replace(/Р/g, '<span class="letter-p">Р</span>')
                                 .replace(/В/g, '<span class="letter-v">В</span>');
             
@@ -1227,7 +1271,8 @@
 
         function updateInstructionArea() {
             const instruction = document.getElementById('instructionArea');
-            instruction.querySelector('h3').textContent = `Module ${currentModule}`;
+            const currentLetter = modules[currentModule].letters[modules[currentModule].letters.length - 1];
+            instruction.querySelector('h3').textContent = currentLetter;
             instruction.querySelector('p').textContent = modules[currentModule].instruction;
         }
 
@@ -1259,7 +1304,6 @@
             document.getElementById('feedback').classList.add('hidden');
         }
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initSpeechRecognition();
             console.log('Russian False Friends Platform initialized');
