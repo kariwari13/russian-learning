@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group 2: False Friends - Russian Reading</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-links {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .intro-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .intro-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .intro-section p {
+            color: #495057;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .module-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .module-btn {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .module-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .module-btn.active {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .learning-area {
+            text-align: center;
+            min-height: 200px;
+        }
+
+        .current-word {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .letter-p {
+            color: #e91e63;
+        }
+
+        .letter-v {
+            color: #9c27b0;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .control-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .mic-btn {
+            background: #e74c3c;
+        }
+
+        .mic-btn:hover {
+            background: #c0392b;
+        }
+
+        .mic-btn.listening {
+            background: #27ae60;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .stop-btn {
+            background: #e74c3c;
+        }
+
+        .stop-btn:hover {
+            background: #c0392b;
+        }
+
+        .instruction {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .instruction h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .instruction p {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .letters-introduced {
+            background: #fff5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            border: 1px solid #fecaca;
+        }
+
+        .letters-introduced h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .letters {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #dc3545;
+            letter-spacing: 5px;
+        }
+
+        .word-image {
+            max-width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: block;
+        }
+
+        .pronunciation-score {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .score-circle {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border: 4px solid white;
+            border-radius: 50%;
+            line-height: 52px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .stats-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+
+        .stats-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .stats-value {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffd89b, #19547b);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: achievementSlide 3s ease-out;
+        }
+
+        @keyframes achievementSlide {
+            0% { transform: translate(-50%, -150%); }
+            20% { transform: translate(-50%, -50%); }
+            80% { transform: translate(-50%, -50%); }
+            100% { transform: translate(-50%, -150%); }
+        }
+
+        .achievement-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+
+        .achievement-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .achievement-desc {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .level-progress {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .exp-bar {
+            background: #e9ecef;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .exp-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #495057;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: #dee2e6;
+            color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .final-message {
+            background: linear-gradient(135deg, #ffd89b, #19547b);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .final-message h2 {
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .nav-links {
+                position: static;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .current-word {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .control-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .module-selector {
+                justify-content: center;
+            }
+
+            .module-btn {
+                flex: 1;
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">🏠 Home</a>
+                <a href="../group1/index.html" class="nav-link">← Group 1</a>
+            </div>
+            <h1>Group 2: False Friends</h1>
+            <p>Letters that look familiar but sound different</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Introduction Section -->
+            <div class="intro-section" id="introSection">
+                <h2>⚠️ False Friends - Deceptive Letters!</h2>
+                <p>These Russian letters look like English letters but sound completely different!</p>
+                <p>Don't be fooled - <strong>Р sounds like R, В sounds like V, Н sounds like N</strong></p>
+                <p><strong>Group 2:</strong> False Friends - <strong>Р В Н С И У Х</strong></p>
+                <button class="control-btn" onclick="startLearning()">Start Learning!</button>
+            </div>
+
+            <div class="module-selector hidden" id="moduleSelector">
+                <button class="module-btn active" onclick="selectModule(1)">Р</button>
+                <button class="module-btn" onclick="selectModule(2)">Р + В</button>
+                <button class="module-btn" onclick="selectModule(3)">+ Н</button>
+                <button class="module-btn" onclick="selectModule(4)">+ С</button>
+                <button class="module-btn" onclick="selectModule(5)">+ И</button>
+                <button class="module-btn" onclick="selectModule(6)">+ У</button>
+                <button class="module-btn" onclick="selectModule(7)">+ Х</button>
+            </div>
+
+            <div class="learning-area">
+                <div class="letters-introduced hidden" id="lettersIntroduced">
+                    <h4>Letters Introduced:</h4>
+                    <div class="letters" id="currentLetters">Р</div>
+                </div>
+
+                <div class="instruction hidden" id="instructionArea">
+                    <h3>🚀 Learn False Friends the Smart Way!</h3>
+                    <p>Learning to read Russian isn't difficult when you follow the right method given on this platform.</p>
+                </div>
+
+                <div class="current-word" id="currentWord">Ready to Start</div>
+                
+                <img class="word-image hidden" id="wordImage" alt="Word illustration">
+
+                <!-- Pronunciation Score -->
+                <div class="pronunciation-score hidden" id="pronunciationScore">
+                    <div>Pronunciation Accuracy</div>
+                    <div class="score-circle" id="scoreCircle">--%</div>
+                    <div id="scoreMessage">Click speak to try!</div>
+                </div>
+
+                <!-- Gamification Elements -->
+                <div class="achievement-popup hidden" id="achievementPopup">
+                    <div class="achievement-content">
+                        <div class="achievement-icon">🏆</div>
+                        <div class="achievement-title" id="achievementTitle">Achievement Unlocked!</div>
+                        <div class="achievement-desc" id="achievementDesc">Great job!</div>
+                    </div>
+                </div>
+
+                <div class="level-progress hidden" id="levelProgress">
+                    <div class="level-info">
+                        <span>Level <span id="currentLevel">1</span></span>
+                        <span id="levelExp">0/100 XP</span>
+                    </div>
+                    <div class="exp-bar">
+                        <div class="exp-fill" id="expFill"></div>
+                    </div>
+                </div>
+                <div class="stats-panel hidden" id="statsPanel">
+                    <h4>Your Progress</h4>
+                    <div class="stats-row">
+                        <span class="stats-label">Words Practiced:</span>
+                        <span class="stats-value" id="wordsPracticed">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Average Score:</span>
+                        <span class="stats-value" id="averageScore">--%</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Current Streak:</span>
+                        <span class="stats-value" id="currentStreak">0</span>
+                    </div>
+                </div>
+
+                <div class="controls hidden" id="controlsArea">
+                    <button class="control-btn" id="listenBtn" onclick="playCurrentWord()">
+                        🔊 Listen
+                    </button>
+                    <button class="control-btn mic-btn" id="micBtn" onclick="startRecording()" disabled>
+                        🎤 Speak
+                    </button>
+                    <button class="control-btn stop-btn hidden" id="stopBtn" onclick="stopAudio()">
+                        ⏹ Stop
+                    </button>
+                </div>
+
+                <div class="feedback hidden" id="feedback"></div>
+
+                <div class="navigation hidden" id="navigationArea">
+                    <button class="nav-btn" id="nextBtn" onclick="nextWord()" disabled>Next Word</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentModule = 1;
+        let currentWordIndex = 0;
+        let currentAudio = null;
+        let recognition = null;
+        let isListening = false;
+        let moduleStarted = false;
+        let learningStarted = false;
+        
+        // Statistics and Gamification
+        let stats = {
+            wordsPracticed: 0,
+            totalScore: 0,
+            scores: [],
+            currentStreak: 0,
+            bestStreak: 0,
+            exp: 0,
+            level: 1,
+            achievements: [],
+            badges: []
+        };
+
+        // Achievement definitions
+        const achievements = {
+            firstWord: { icon: '🎯', title: 'First Step!', desc: 'Completed your first word!' },
+            streak5: { icon: '🔥', title: 'On Fire!', desc: '5 words in a row!' },
+            streak10: { icon: '⚡', title: 'Lightning Speed!', desc: '10 words in a row!' },
+            perfectModule: { icon: '🌟', title: 'Perfectionist!', desc: 'Perfect score in a module!' },
+            speedDemon: { icon: '🚀', title: 'Speed Demon!', desc: 'Completed 20 words!' },
+            moduleComplete: { icon: '🏆', title: 'Module Master!', desc: 'Completed your first module!' },
+            falseFriendsComplete: { icon: '⚠️', title: 'False Friends Master!', desc: 'Mastered the False Friends group!' }
+        };
+
+        // Module data for False Friends
+        const modules = {
+            1: {
+                letters: ['Р'],
+                words: ['МОТОР', 'МАРКА', 'КРЕМ', 'КАМЕРА', 'АРОМАТ', 'МЕТР', 'РОМ', 'КАРТА', 'ТЕАТР', 'МЕТРО', 'РАКЕТА', 'СЕКТОР'],
+                instruction: "Module 1: Р (pink like rose) = R sound. Don't be fooled - it looks like P but sounds like R!",
+                images: {}
+            },
+            2: {
+                letters: ['Р', 'В'],
+                words: ['АВТОМАТ', 'ВИРУС', 'КВЕСТ', 'ВИНО', 'НЕРВ', 'АВТОР', 'ВЕКТОР', 'ЕВРО', 'ВИТАМИН', 'АКТИВ', 'СЕРВИС', 'ВАКУУМ'],
+                instruction: "Module 2: Adding В (violet) = V sound. В looks like B but sounds like V!",
+                images: {}
+            },
+            3: {
+                letters: ['Р', 'В', 'Н'],
+                words: ['ТАНК', 'МОМЕНТ', 'МАНЕКЕН', 'АНКЕТА', 'ТОН', 'АНТЕННА', 'КОНТАКТ', 'ТОННА', 'КОНТРАКТ', 'ТРЕНЕР'],
+                instruction: "Module 3: Adding Н = N sound. Н looks like football goals - think 'Net!' when scored.",
+                images: {}
+            },
+            4: {
+                letters: ['Р', 'В', 'Н', 'С'],
+                words: ['КОСМОС', 'МАСКА', 'ТЕСТ', 'ТЕКСТ', 'АСТМА', 'СТРЕСС', 'КОНТЕКСТ', 'МАСТЕР', 'РЕСТОРАН', 'ОРКЕСТР'],
+                instruction: "Module 4: Adding С = S sound. С is shaped like a snake - makes 'ssss' sound.",
+                images: {}
+            },
+            5: {
+                letters: ['Р', 'В', 'Н', 'С', 'И'],
+                words: ['МИКРОН', 'КОМИТЕТ', 'ТОКИО', 'МАТЕМАТИКА', 'АССИСТЕНТ', 'МЕКСИКА', 'ИНТЕРЕС', 'КЕРОСИН', 'МОНИТОР', 'РИТМ'],
+                instruction: "Module 5: Adding И = I sound. И looks like books (two standing, one across) - think 'image'.",
+                images: {}
+            },
+            6: {
+                letters: ['Р', 'В', 'Н', 'С', 'И', 'У'],
+                words: ['САКУРА', 'АКСЕССУАР', 'ИНСТИТУТ', 'НОТАРИУС', 'СИНУС', 'ТУР', 'ТАТУ', 'АКУСТИКА', 'КОНТУР', 'ТУРИСТ'],
+                instruction: "Module 6: Adding У = U sound. У looks like a slingshot - think 'shoot' sound.",
+                images: {}
+            },
+            7: {
+                letters: ['Р', 'В', 'Н', 'С', 'И', 'У', 'Х'],
+                words: ['ТЕХНИКА', 'ХРОМ', 'ХАОС', 'ХРОНОМЕТР', 'МОНАРХ', 'АРХИВ', 'ХИТ', 'ХИМЕРА', 'ХАКЕР', 'ХАРАКТЕР'],
+                instruction: "Module 7: Adding Х = H sound. Х is the cross you put 'HERE' - sign here!",
+                images: {}
+            }
+        };
+
+        function startLearning() {
+            learningStarted = true;
+            document.getElementById('introSection').classList.add('hidden');
+            document.getElementById('moduleSelector').classList.remove('hidden');
+            document.getElementById('lettersIntroduced').classList.remove('hidden');
+            document.getElementById('instructionArea').classList.remove('hidden');
+            document.getElementById('controlsArea').classList.remove('hidden');
+            document.getElementById('navigationArea').classList.remove('hidden');
+            document.getElementById('statsPanel').classList.remove('hidden');
+            document.getElementById('levelProgress').classList.remove('hidden');
+            
+            selectModule(1);
+            updateStats();
+            updateLevelDisplay();
+        }
+
+        function nextWord() {
+            hideFeedback();
+            
+            currentWordIndex++;
+            
+            if (currentWordIndex >= modules[currentModule].words.length) {
+                // Module complete - check if there's next module
+                if (currentModule < Object.keys(modules).length) {
+                    // Go directly to next module
+                    nextModule();
+                    return;
+                } else {
+                    // All modules complete
+                    showFinalCompletion();
+                    moduleStarted = false;
+                    updateButtons();
+                    return;
+                }
+            }
+            
+            // Regular next word
+            updateExerciseDisplay();
+            updateButtons();
+            updateProgress();
+        }
+
+        function nextModule() {
+            if (currentModule < Object.keys(modules).length) {
+                selectModule(currentModule + 1);
+            }
+        }
+
+        function showFinalCompletion() {
+            const content = document.querySelector('.learning-area');
+            const congratulations = document.createElement('div');
+            congratulations.className = 'final-message';
+            congratulations.innerHTML = `
+                <h2>🎉 Congratulations! You've mastered False Friends!</h2>
+                <p>You've conquered the tricky letters that look familiar but sound different!</p>
+                <p>Ready for the next letter group: <strong>New Letters</strong></p>
+                <p>These letters are completely new but easier to remember!</p>
+                <button class="control-btn" onclick="alert('New Letters module coming soon!')" style="margin-top: 15px;">Coming Soon: New Letters</button>
+            `;
+            content.appendChild(congratulations);
+        }
+
+        function updateExerciseDisplay() {
+            const pronunciationScore = document.getElementById('pronunciationScore');
+            pronunciationScore.classList.remove('hidden');
+            
+            if (moduleStarted && currentWordIndex < modules[currentModule].words.length) {
+                displayCurrentWord();
+                // Enable microphone immediately when word is displayed
+                document.getElementById('micBtn').disabled = false;
+            }
+        }
+
+        // Gamification Functions
+        function addExp(points) {
+            stats.exp += points;
+            
+            const expNeeded = stats.level * 100;
+            if (stats.exp >= expNeeded) {
+                stats.level++;
+                stats.exp = stats.exp - expNeeded;
+                showAchievement('🆙', 'Level Up!', `Welcome to Level ${stats.level}!`);
+            }
+            
+            updateLevelDisplay();
+        }
+
+        function updateLevelDisplay() {
+            document.getElementById('currentLevel').textContent = stats.level;
+            const expNeeded = stats.level * 100;
+            document.getElementById('levelExp').textContent = `${stats.exp}/${expNeeded} XP`;
+            
+            const expPercent = (stats.exp / expNeeded) * 100;
+            document.getElementById('expFill').style.width = expPercent + '%';
+        }
+
+        function showAchievement(icon, title, description) {
+            const popup = document.getElementById('achievementPopup');
+            document.getElementById('achievementTitle').textContent = title;
+            document.getElementById('achievementDesc').textContent = description;
+            popup.querySelector('.achievement-icon').textContent = icon;
+            
+            popup.classList.remove('hidden');
+            
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 3000);
+        }
+
+        function checkAchievements() {
+            // First word achievement
+            if (stats.wordsPracticed === 1 && !stats.achievements.includes('firstWord')) {
+                stats.achievements.push('firstWord');
+                showAchievement(achievements.firstWord.icon, achievements.firstWord.title, achievements.firstWord.desc);
+                addExp(25);
+            }
+            
+            // Streak achievements
+            if (stats.currentStreak === 5 && !stats.achievements.includes('streak5')) {
+                stats.achievements.push('streak5');
+                stats.badges.push('🔥 Fire Streak');
+                showAchievement(achievements.streak5.icon, achievements.streak5.title, achievements.streak5.desc);
+                addExp(50);
+            }
+            
+            if (stats.currentStreak === 10 && !stats.achievements.includes('streak10')) {
+                stats.achievements.push('streak10');
+                stats.badges.push('⚡ Lightning Fast');
+                showAchievement(achievements.streak10.icon, achievements.streak10.title, achievements.streak10.desc);
+                addExp(100);
+            }
+            
+            // Speed achievement
+            if (stats.wordsPracticed === 20 && !stats.achievements.includes('speedDemon')) {
+                stats.achievements.push('speedDemon');
+                stats.badges.push('🚀 Speed Master');
+                showAchievement(achievements.speedDemon.icon, achievements.speedDemon.title, achievements.speedDemon.desc);
+                addExp(75);
+            }
+            
+            // Update stats display with best streak
+            if (stats.currentStreak > stats.bestStreak) {
+                stats.bestStreak = stats.currentStreak;
+            }
+        }
+
+        // Audio management
+        function stopCurrentAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+            }
+            hideStopButton();
+        }
+
+        function showStopButton() {
+            document.getElementById('stopBtn').classList.remove('hidden');
+        }
+
+        function hideStopButton() {
+            document.getElementById('stopBtn').classList.add('hidden');
+        }
+
+        function stopAudio() {
+            stopCurrentAudio();
+        }
+
+        async function playTextToSpeech(text) {
+            try {
+                stopCurrentAudio();
+                showStopButton();
+                
+                const cleanText = text.replace(/́/g, '').toLowerCase();
+                
+                await playWebSpeechTTS(text);
+                
+            } catch (error) {
+                console.error('Audio playback error:', error);
+                await playWebSpeechTTS(text);
+            }
+        }
+
+        async function playWebSpeechTTS(text) {
+            try {
+                if (!('speechSynthesis' in window)) {
+                    throw new Error('Speech synthesis not supported');
+                }
+
+                speechSynthesis.cancel();
+
+                await new Promise((resolve) => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        resolve();
+                    } else {
+                        const loadVoices = () => {
+                            if (speechSynthesis.getVoices().length > 0) {
+                                speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+                                resolve();
+                            }
+                        };
+                        speechSynthesis.addEventListener('voiceschanged', loadVoices);
+                        setTimeout(resolve, 1000);
+                    }
+                });
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                utterance.lang = 'ru-RU';
+                utterance.rate = 0.8;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                const voices = speechSynthesis.getVoices();
+                const russianVoices = voices.filter(voice => 
+                    voice.lang === 'ru-RU' ||
+                    voice.lang.startsWith('ru-') ||
+                    voice.name.toLowerCase().includes('russian')
+                );
+                
+                const selectedVoice = russianVoices.find(v => 
+                    v.name.toLowerCase().includes('google')
+                ) || russianVoices[0];
+                
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    console.log('Using Web Speech voice:', selectedVoice.name);
+                }
+
+                utterance.onstart = () => console.log('Web Speech started');
+                utterance.onend = () => {
+                    console.log('Web Speech ended');
+                    hideStopButton();
+                };
+                utterance.onerror = (event) => {
+                    if (event.error !== 'interrupted') {
+                        console.error('Web Speech error:', event.error);
+                    }
+                    hideStopButton();
+                };
+
+                currentAudio = {
+                    pause: () => {
+                        speechSynthesis.cancel();
+                        hideStopButton();
+                    },
+                    paused: false
+                };
+
+                speechSynthesis.speak(utterance);
+
+            } catch (error) {
+                console.error('Web Speech error:', error);
+                hideStopButton();
+                throw error;
+            }
+        }
+
+        // Speech recognition
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ru-RU';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    const micBtn = document.getElementById('micBtn');
+                    micBtn.classList.add('listening');
+                    micBtn.textContent = '🎤 Listening...';
+                    showFeedback('Speak now...', 'info');
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    console.log('Recognized:', transcript);
+                    
+                    const currentWord = modules[currentModule].words[currentWordIndex];
+                    const score = calculatePronunciationScore(transcript, currentWord);
+                    showPronunciationScore(score, transcript, currentWord);
+                    showFeedback(`You said: "${transcript}"`, score >= 70 ? 'success' : 'error');
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    showFeedback('Could not recognize speech. Try again.', 'error');
+                    stopListening();
+                };
+
+                recognition.onend = () => {
+                    stopListening();
+                };
+            }
+        }
+
+        function startRecording() {
+            if (!recognition) {
+                showFeedback('Speech recognition not available', 'error');
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+                return;
+            }
+
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Recognition start error:', error);
+                showFeedback('Could not start recording', 'error');
+            }
+        }
+
+        function stopListening() {
+            isListening = false;
+            const micBtn = document.getElementById('micBtn');
+            micBtn.classList.remove('listening');
+            micBtn.textContent = '🎤 Speak';
+            
+            setTimeout(() => {
+                micBtn.disabled = false;
+            }, 500);
+            
+            hideFeedback();
+        }
+
+        function calculatePronunciationScore(spoken, target) {
+            const spokenClean = spoken.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '');
+            const targetClean = target.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '');
+            
+            if (spokenClean === targetClean) return 100;
+            
+            const matrix = [];
+            const n = spokenClean.length;
+            const m = targetClean.length;
+            
+            for (let i = 0; i <= n; i++) {
+                matrix[i] = [i];
+            }
+            for (let j = 0; j <= m; j++) {
+                matrix[0][j] = j;
+            }
+            
+            for (let i = 1; i <= n; i++) {
+                for (let j = 1; j <= m; j++) {
+                    if (spokenClean.charAt(i - 1) === targetClean.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+                    }
+                }
+            }
+            
+            const maxLen = Math.max(n, m);
+            if (maxLen === 0) return 100;
+            
+            const similarity = ((maxLen - matrix[n][m]) / maxLen) * 100;
+            return Math.max(0, Math.round(similarity));
+        }
+
+        function showPronunciationScore(score, spoken, target) {
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreMessage = document.getElementById('scoreMessage');
+            
+            scoreCircle.textContent = score + '%';
+            
+            if (score >= 90) {
+                scoreMessage.textContent = 'Perfect! 🌟';
+                scoreCircle.style.borderColor = '#28a745';
+                addExp(25);
+            } else if (score >= 70) {
+                scoreMessage.textContent = 'Good job! 👍';
+                scoreCircle.style.borderColor = '#ffc107';
+                addExp(15);
+            } else if (score >= 50) {
+                scoreMessage.textContent = 'Keep trying! 💪';
+                scoreCircle.style.borderColor = '#fd7e14';
+                addExp(5);
+            } else {
+                scoreMessage.textContent = 'Try again! 🔄';
+                scoreCircle.style.borderColor = '#dc3545';
+            }
+            
+            stats.scores.push(score);
+            stats.wordsPracticed++;
+            stats.totalScore += score;
+            
+            if (score >= 70) {
+                stats.currentStreak++;
+                stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+            } else {
+                stats.currentStreak = 0;
+            }
+            
+            checkAchievements();
+            updateStats();
+            
+            if (score >= 70) {
+                setTimeout(() => {
+                    document.getElementById('nextBtn').disabled = false;
+                }, 1500);
+            }
+        }
+
+        function playCurrentWord() {
+            if (!moduleStarted || currentWordIndex >= modules[currentModule].words.length) {
+                return;
+            }
+            
+            const word = modules[currentModule].words[currentWordIndex];
+            displayCurrentWord();
+            playTextToSpeech(word);
+        }
+
+        function updateButtons() {
+            const listenBtn = document.getElementById('listenBtn');
+            const micBtn = document.getElementById('micBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (!moduleStarted) {
+                listenBtn.disabled = true;
+                micBtn.disabled = true;
+                nextBtn.disabled = true;
+            } else if (currentWordIndex >= modules[currentModule].words.length) {
+                listenBtn.disabled = true;
+                micBtn.disabled = true;
+                nextBtn.disabled = true;
+            } else {
+                listenBtn.disabled = false;
+                micBtn.disabled = false;
+                nextBtn.disabled = false;
+                listenBtn.textContent = '🔊 Listen';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('wordsPracticed').textContent = stats.wordsPracticed;
+            
+            const avgScore = stats.scores.length > 0 
+                ? Math.round(stats.totalScore / stats.scores.length)
+                : 0;
+            document.getElementById('averageScore').textContent = avgScore + '%';
+            document.getElementById('currentStreak').textContent = stats.currentStreak;
+        }
+
+        function selectModule(moduleNum) {
+            currentModule = moduleNum;
+            currentWordIndex = 0;
+            moduleStarted = true;
+            
+            document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.module-btn')[moduleNum - 1].classList.add('active');
+            
+            updateLettersDisplay();
+            updateInstructionArea();
+            resetWordDisplay();
+            updateButtons();
+            updateProgress();
+            updateExerciseDisplay();
+        }
+
+        function displayCurrentWord() {
+            const word = modules[currentModule].words[currentWordIndex];
+            const wordElement = document.getElementById('currentWord');
+            
+            // Apply color styling to Р and В in words
+            let styledWord = word.replace(/Р/g, '<span class="letter-p">Р</span>')
+                                .replace(/В/g, '<span class="letter-v">В</span>');
+            
+            wordElement.innerHTML = styledWord;
+        }
+
+        function updateLettersDisplay() {
+            const lettersElement = document.getElementById('currentLetters');
+            const letters = modules[currentModule].letters;
+            
+            let lettersHTML = letters.map(letter => {
+                if (letter === 'Р') {
+                    return `<span class="letter-p">${letter}</span>`;
+                } else if (letter === 'В') {
+                    return `<span class="letter-v">${letter}</span>`;
+                } else {
+                    return letter;
+                }
+            }).join('  ');
+            
+            lettersElement.innerHTML = lettersHTML;
+        }
+
+        function updateInstructionArea() {
+            const instruction = document.getElementById('instructionArea');
+            instruction.querySelector('h3').textContent = `Module ${currentModule}`;
+            instruction.querySelector('p').textContent = modules[currentModule].instruction;
+        }
+
+        function resetWordDisplay() {
+            document.getElementById('currentWord').textContent = 'Ready to Start';
+            document.getElementById('wordImage').classList.add('hidden');
+            hideFeedback();
+        }
+
+        function updateProgress() {
+            if (!moduleStarted) {
+                document.getElementById('progressFill').style.width = '0%';
+                return;
+            }
+            
+            const totalWords = modules[currentModule].words.length;
+            const progress = (currentWordIndex / totalWords) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            feedback.classList.remove('hidden');
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').classList.add('hidden');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initSpeechRecognition();
+            console.log('Russian False Friends Platform initialized');
+            
+            document.addEventListener('click', function() {
+                if (currentAudio && currentAudio.paused) {
+                    hideStopButton();
+                }
+            });
+        });
+
+        window.addEventListener('beforeunload', function() {
+            stopCurrentAudio();
+        });
+    </script>
+</body>
+</html>
