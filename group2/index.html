@@ -809,8 +809,9 @@
             congratulations.innerHTML = `
                 <h2>🎉 Congratulations! You've mastered False Friends!</h2>
                 <p>You've conquered the tricky letters that look familiar but sound different!</p>
-                <p>Ready for the next letter group: <strong>New Letters</strong></p>
-                <p>These letters are completely new but easier to remember!</p>
+                <p>Ready for additional practice?</p>
+                <button class="control-btn" onclick="window.location.href='practice.html'" style="margin: 10px;">Practice Exercises</button>
+                <p>Or continue to the next letter group: <strong>New Letters</strong></p>
                 <button class="control-btn" onclick="alert('New Letters module coming soon!')" style="margin-top: 15px;">Coming Soon: New Letters</button>
             `;
             content.appendChild(congratulations);
