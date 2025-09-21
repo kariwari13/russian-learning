@@ -55,6 +55,12 @@
             color: #6c757d;
             margin-bottom: 15px;
         }
+        .group-letters {
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
         .group-progress {
             background: #e9ecef;
             height: 8px;
@@ -67,6 +73,34 @@
             height: 100%;
             transition: width 0.3s ease;
         }
+        .practice-link {
+            background: #17a2b8;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+        .practice-link:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+        .letter-correspondences {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .letter-pair {
+            background: #e9ecef;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +111,8 @@
         </div>
         
         <div class="group-card available" onclick="goToGroup(1)">
-            <div class="group-title">Group 1: Similar Letters (А К М О Т Е)</div>
+            <div class="group-title">Group 1: Similar Letters</div>
+            <div class="group-letters">А К М О Т Е</div>
             <div class="group-description">Letters that look and sound like Latin letters</div>
             <div class="group-progress">
                 <div class="progress-fill" style="width: 100%"></div>
@@ -85,13 +120,25 @@
             <div>✅ Available</div>
         </div>
         
-        <div class="group-card locked">
-            <div class="group-title">Group 2: False Friends (Р Н С И У В Х)</div>
-            <div class="group-description">Letters that look familiar but sound different</div>
-            <div class="group-progress">
-                <div class="progress-fill" style="width: 0%"></div>
+        <div class="group-card available" onclick="goToGroup(2)">
+            <div class="group-title">Group 2: False Friends 
+                <a href="group2/practice.html" class="practice-link" onclick="event.stopPropagation()">Practice</a>
             </div>
-            <div>🔒 Complete Group 1 to unlock</div>
+            <div class="group-letters">Р Н С И У В Х</div>
+            <div class="group-description">Letters that look familiar but sound different</div>
+            <div class="letter-correspondences">
+                <span class="letter-pair">Р=R</span>
+                <span class="letter-pair">Н=N</span>
+                <span class="letter-pair">С=S</span>
+                <span class="letter-pair">И=I</span>
+                <span class="letter-pair">У=OO</span>
+                <span class="letter-pair">В=V</span>
+                <span class="letter-pair">Х=H</span>
+            </div>
+            <div class="group-progress">
+                <div class="progress-fill" style="width: 100%"></div>
+            </div>
+            <div>✅ Available</div>
         </div>
         
         <div class="group-card locked">
@@ -126,6 +173,8 @@
         function goToGroup(groupNumber) {
             if (groupNumber === 1) {
                 window.location.href = 'group1/index.html';
+            } else if (groupNumber === 2) {
+                window.location.href = 'group2/index.html';
             } else {
                 alert('Complete previous groups first!');
             }
