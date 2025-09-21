@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group 2: Practice Exercises</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-links {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .exercise-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .exercise-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .exercise-btn:hover {
+            background: #20c997;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .exercise-btn.active {
+            background: #20c997;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .exercise-area {
+            text-align: center;
+            min-height: 300px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .question {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answer-input {
+            font-size: 1.5rem;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            width: 200px;
+            max-width: 100%;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .answer-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            min-width: 80px;
+        }
+
+        .option-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .control-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .control-btn:hover {
+            background: #20c997;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .control-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .feedback.hidden {
+            display: none;
+        }
+
+        .stats-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+
+        .stats-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .stats-value {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .exercise-info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .exercise-info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .exercise-info p {
+            color: #424242;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .nav-links {
+                position: static;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .exercise-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .exercise-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .question {
+                font-size: 1.5rem;
+            }
+
+            .answer-options {
+                gap: 10px;
+            }
+
+            .option-btn {
+                min-width: 60px;
+                padding: 10px 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">← Back to Learning</a>
+                <a href="../index.html" class="nav-link">🏠 Home</a>
+            </div>
+            <h1>Group 2: Practice Exercises</h1>
+            <p>Test your knowledge without hints!</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="exercise-selector">
+                <button class="exercise-btn active" onclick="selectExercise('letters')">Letter Recognition</button>
+                <button class="exercise-btn" onclick="selectExercise('dictation')">Dictation</button>
+            </div>
+
+            <!-- Letter Recognition Exercise -->
+            <div id="lettersExercise" class="exercise-area">
+                <div class="exercise-info">
+                    <h3>Letter Recognition</h3>
+                    <p>Match Russian letters with their English sound equivalents. No hints provided!</p>
+                </div>
+
+                <div class="question" id="letterQuestion">Click "New Question" to start</div>
+
+                <div class="answer-options" id="letterOptions"></div>
+
+                <div class="feedback hidden" id="letterFeedback"></div>
+
+                <button class="control-btn" onclick="newLetterQuestion()">New Question</button>
+                <button class="control-btn" onclick="checkLetterAnswer()" id="checkLetterBtn" disabled>Check Answer</button>
+            </div>
+
+            <!-- Dictation Exercise -->
+            <div id="dictationExercise" class="exercise-area hidden">
+                <div class="exercise-info">
+                    <h3>Dictation</h3>
+                    <p>Listen carefully and type the word you hear. Use only Russian letters!</p>
+                </div>
+
+                <div class="question" id="dictationQuestion">Click "Play Word" to start</div>
+
+                <input type="text" class="answer-input" id="dictationInput" placeholder="Type the word here...">
+
+                <div class="feedback hidden" id="dictationFeedback"></div>
+
+                <button class="control-btn" onclick="playDictationWord()">🔊 Play Word</button>
+                <button class="control-btn" onclick="checkDictationAnswer()">Check Answer</button>
+                <button class="control-btn" onclick="newDictationQuestion()">New Word</button>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-panel">
+                <h4>Your Progress</h4>
+                <div class="stats-row">
+                    <span class="stats-label">Questions Answered:</span>
+                    <span class="stats-value" id="totalAnswered">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Correct Answers:</span>
+                    <span class="stats-value" id="correctAnswers">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Accuracy:</span>
+                    <span class="stats-value" id="accuracy">--%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Exercise data
+        const letterPairs = [
+            {russian: 'Р', english: 'R'},
+            {russian: 'Н', english: 'N'},
+            {russian: 'С', english: 'S'},
+            {russian: 'И', english: 'I'},
+            {russian: 'У', english: 'OO'},
+            {russian: 'В', english: 'V'},
+            {russian: 'Х', english: 'H'}
+        ];
+
+        const dictationWords = [
+            'МОТО́Р', 'МА́РКА', 'КРЕМ', 'КА́МЕРА', 'АРОМА́Т', 'МЕТР', 'РОМ', 'КА́РТА', 'ТЕА́ТР', 'МЕТРО́', 'РАКЕ́ТА', 'СЕ́КТОР',
+            'ТАНК', 'МАКЕ́Т', 'МОМЕ́НТ', 'МАНЕКЕ́Н', 'АНКЕ́ТА', 'ТЕ́МА', 'ТОН', 'АНТЕ́ННА', 'КОНТА́КТ', 'ТО́ННА', 'КОНТРА́КТ', 'ТРЕ́НЕР',
+            'КО́СМОС', 'МА́СКА', 'ТЕСТ', 'ТЕКСТ', 'СЕКС', 'А́СТМА', 'СТРЕСС', 'КОНТЕ́КСТ', 'МА́СТЕР', 'РЕСТОРА́Н', 'ОРКЕ́СТР',
+            'МИКРО́Н', 'КОМИТЕ́Т', 'ТО́КИО', 'МАТЕМАТИ́КА', 'АССИСТЕ́НТ', 'МЕ́КСИКА', 'ИНТЕРЕ́С', 'КЕРОСИ́Н', 'МОНИ́ТОР', 'РИТМ',
+            'САКУ́РА', 'АКСЕССУА́Р', 'ИНСТИТУ́Т', 'НОТА́РИУС', 'СИ́НУС', 'ТУР', 'ТАТУ́', 'АКУ́СТИКА', 'КОНТУ́Р', 'ТУРИ́СТ',
+            'АВТОМА́Т', 'ВИ́РУС', 'КВЕСТ', 'АСТРОНА́ВТ', 'ВИНО́', 'АНТИВИ́РУС', 'НЕРВ', 'А́ВТОР', 'ВЕ́КТОР', 'Е́ВРО', 'ВИТАМИ́Н',
+            'ТЕ́ХНИКА', 'ХРОМ', 'ХА́ОС', 'ХРОНО́МЕТР', 'МОНА́РХ', 'АРХИ́В', 'ХИТ', 'ХИМЕ́РА', 'ХА́КЕР', 'ХАРА́КТЕР', 'ХО́РРОР', 'ХРО́НИКА'
+        ];
+
+        // Global variables
+        let currentExercise = 'letters';
+        let currentLetterQuestion = null;
+        let currentDictationWord = null;
+        let selectedOption = null;
+        let stats = {
+            totalAnswered: 0,
+            correctAnswers: 0
+        };
+
+        // Exercise selection
+        function selectExercise(type) {
+            currentExercise = type;
+            
+            // Update buttons
+            document.querySelectorAll('.exercise-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide exercises
+            if (type === 'letters') {
+                document.getElementById('lettersExercise').classList.remove('hidden');
+                document.getElementById('dictationExercise').classList.add('hidden');
+            } else {
+                document.getElementById('lettersExercise').classList.add('hidden');
+                document.getElementById('dictationExercise').classList.remove('hidden');
+            }
+            
+            // Reset current questions
+            resetExercises();
+        }
+
+        function resetExercises() {
+            document.getElementById('letterFeedback').classList.add('hidden');
+            document.getElementById('dictationFeedback').classList.add('hidden');
+            document.getElementById('dictationInput').value = '';
+            selectedOption = null;
+            currentLetterQuestion = null;
+            currentDictationWord = null;
+        }
+
+        // Letter Recognition Exercise
+        function newLetterQuestion() {
+            resetLetterExercise();
+            
+            // Random question type: Russian->English or English->Russian
+            const questionType = Math.random() < 0.5 ? 'rusToEng' : 'engToRus';
+            const randomPair = letterPairs[Math.floor(Math.random() * letterPairs.length)];
+            
+            currentLetterQuestion = {
+                type: questionType,
+                correct: randomPair,
+                correctAnswer: questionType === 'rusToEng' ? randomPair.english : randomPair.russian
+            };
+            
+            // Set question
+            const questionText = questionType === 'rusToEng' 
+                ? `What sound does "${randomPair.russian}" make?`
+                : `Which Russian letter makes "${randomPair.english}" sound?`;
+            
+            document.getElementById('letterQuestion').textContent = questionText;
+            
+            // Generate options
+            generateLetterOptions();
+        }
+
+        function generateLetterOptions() {
+            const optionsContainer = document.getElementById('letterOptions');
+            optionsContainer.innerHTML = '';
+            
+            const correctAnswer = currentLetterQuestion.correctAnswer;
+            const questionType = currentLetterQuestion.type;
+            
+            // Get all possible answers
+            const allAnswers = questionType === 'rusToEng' 
+                ? letterPairs.map(pair => pair.english)
+                : letterPairs.map(pair => pair.russian);
+            
+            // Select 3 random wrong answers + 1 correct
+            const wrongAnswers = allAnswers.filter(answer => answer !== correctAnswer);
+            const shuffledWrong = wrongAnswers.sort(() => Math.random() - 0.5).slice(0, 3);
+            
+            // Combine and shuffle all options
+            const allOptions = [correctAnswer, ...shuffledWrong].sort(() => Math.random() - 0.5);
+            
+            // Create option buttons
+            allOptions.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectLetterOption(btn, option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectLetterOption(btn, option) {
+            // Remove previous selection
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            
+            // Select current option
+            btn.classList.add('selected');
+            selectedOption = option;
+            
+            // Enable check button
+            document.getElementById('checkLetterBtn').disabled = false;
+        }
+
+        function checkLetterAnswer() {
+            if (!selectedOption) return;
+            
+            const isCorrect = selectedOption === currentLetterQuestion.correctAnswer;
+            const feedback = document.getElementById('letterFeedback');
+            
+            stats.totalAnswered++;
+            if (isCorrect) {
+                stats.correctAnswers++;
+                feedback.textContent = 'Correct! Well done!';
+                feedback.className = 'feedback success';
+            } else {
+                feedback.textContent = `Incorrect. The correct answer is: ${currentLetterQuestion.correctAnswer}`;
+                feedback.className = 'feedback error';
+            }
+            
+            feedback.classList.remove('hidden');
+            document.getElementById('checkLetterBtn').disabled = true;
+            updateStats();
+        }
+
+        function resetLetterExercise() {
+            document.getElementById('letterFeedback').classList.add('hidden');
+            document.getElementById('letterOptions').innerHTML = '';
+            document.getElementById('checkLetterBtn').disabled = true;
+            selectedOption = null;
+        }
+
+        // Dictation Exercise
+        function newDictationQuestion() {
+            resetDictationExercise();
+            
+            // Select random word
+            currentDictationWord = dictationWords[Math.floor(Math.random() * dictationWords.length)];
+            
+            document.getElementById('dictationQuestion').textContent = 'Listen and type the word:';
+        }
+
+        function playDictationWord() {
+            if (!currentDictationWord) {
+                newDictationQuestion();
+            }
+            
+            if (currentDictationWord) {
+                playTextToSpeech(currentDictationWord);
+            }
+        }
+
+        function checkDictationAnswer() {
+            const userAnswer = document.getElementById('dictationInput').value.trim().toUpperCase();
+            
+            if (!userAnswer) {
+                alert('Please type your answer first!');
+                return;
+            }
+            
+            if (!currentDictationWord) {
+                alert('Please play a word first!');
+                return;
+            }
+            
+            // Remove stress marks for comparison
+            const correctAnswer = currentDictationWord.replace(/́/g, '');
+            const userAnswerClean = userAnswer.replace(/́/g, '');
+            
+            const isCorrect = userAnswerClean === correctAnswer;
+            const feedback = document.getElementById('dictationFeedback');
+            
+            stats.totalAnswered++;
+            if (isCorrect) {
+                stats.correctAnswers++;
+                feedback.textContent = 'Correct! Well done!';
+                feedback.className = 'feedback success';
+            } else {
+                feedback.textContent = `Incorrect. The correct answer is: ${correctAnswer}`;
+                feedback.className = 'feedback error';
+            }
+            
+            feedback.classList.remove('hidden');
+            updateStats();
+        }
+
+        function resetDictationExercise() {
+            document.getElementById('dictationFeedback').classList.add('hidden');
+            document.getElementById('dictationInput').value = '';
+        }
+
+        // Audio playback
+        async function playTextToSpeech(text) {
+            try {
+                const cleanText = text.replace(/́/g, '').toLowerCase();
+                const audioBaseUrl = 'https://raw.githubusercontent.com/kariwari13/russian-learning/main/audio/';
+                const audioUrl = `${audioBaseUrl}${cleanText}.mp3`;
+                
+                console.log(`Trying to play audio: ${audioUrl}`);
+                
+                const audio = new Audio(audioUrl);
+                
+                audio.onerror = () => {
+                    console.log('Custom audio failed, using Web Speech API');
+                    playWebSpeechTTS(text);
+                };
+                
+                audio.play().catch(() => {
+                    playWebSpeechTTS(text);
+                });
+                
+            } catch (error) {
+                console.error('Audio playback error:', error);
+                playWebSpeechTTS(text);
+            }
+        }
+
+        function playWebSpeechTTS(text) {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ru-RU';
+                utterance.rate = 0.8;
+                
+                const voices = speechSynthesis.getVoices();
+                const russianVoice = voices.find(voice => voice.lang.startsWith('ru'));
+                if (russianVoice) {
+                    utterance.voice = russianVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Stats
+        function updateStats() {
+            document.getElementById('totalAnswered').textContent = stats.totalAnswered;
+            document.getElementById('correctAnswers').textContent = stats.correctAnswers;
+            
+            const accuracy = stats.totalAnswered > 0 
+                ? Math.round((stats.correctAnswers / stats.totalAnswered) * 100)
+                : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Group 2 Practice Platform initialized');
+            
+            // Load voices for speech synthesis
+            if ('speechSynthesis' in window) {
+                speechSynthesis.getVoices();
+                speechSynthesis.addEventListener('voiceschanged', () => {
+                    speechSynthesis.getVoices();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
