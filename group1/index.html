@@ -250,27 +250,6 @@
             margin-bottom: 10px;
         }
 
-        .letters-introduced {
-            background: #f0fff4;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: center;
-            border: 1px solid #c3e6cb;
-        }
-
-        .letters-introduced h4 {
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-
-        .letters {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #28a745;
-            letter-spacing: 5px;
-        }
-
         .word-image {
             max-width: 150px;
             height: 150px;
@@ -434,7 +413,7 @@
 
         .navigation {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             margin-top: 30px;
         }
 
@@ -606,14 +585,9 @@
             </div>
 
             <div class="learning-area">
-                <div class="letters-introduced hidden" id="lettersIntroduced">
-                    <h4>Letters Introduced:</h4>
-                    <div class="letters" id="currentLetters">М  А</div>
-                </div>
-
                 <div class="instruction hidden" id="instructionArea">
-                    <h3>🚀 Learn to Read Russian the Smart Way!</h3>
-                    <p>Learning to read Russian isn't difficult when you follow the right method given on this platform.</p>
+                    <h3>М, А</h3>
+                    <p>Meet your first Russian letters М (M) and А (A). These letters look and sound very similar to English M and A!</p>
                 </div>
 
                 <!-- Stress explanation section -->
@@ -688,6 +662,7 @@
                 <div class="feedback hidden" id="feedback"></div>
 
                 <div class="navigation hidden" id="navigationArea">
+                    <button class="nav-btn" id="prevBtn" onclick="prevWord()" disabled>Previous Word</button>
                     <button class="nav-btn" id="nextBtn" onclick="nextWord()" disabled>Next Word</button>
                 </div>
             </div>
@@ -735,21 +710,21 @@
         };
 
         // Base URLs for GitHub content
-        const imageBaseUrl = 'https://raw.githubusercontent.com/kariwari13/russianpractice/main/images/';
-        const audioBaseUrl = 'https://raw.githubusercontent.com/kariwari13/russianpractice/main/audio/';
+        const imageBaseUrl = 'https://raw.githubusercontent.com/kariwari13/russian-learning/main/images/';
+        const audioBaseUrl = 'https://raw.githubusercontent.com/kariwari13/russian-learning/main/audio/';
 
         // Module data
         const modules = {
             1: {
                 letters: ['М', 'А'],
                 words: ['МАМА'],
-                instruction: "Module 1: Meet your first Russian letters М (M) and А (A). These letters look and sound very similar to English M and A!",
+                instruction: "Meet your first Russian letters М (M) and А (A). These letters look and sound very similar to English M and A!",
                 images: { 'МАМА': 'mama.jpg.png' }
             },
             2: {
                 letters: ['М', 'А', 'К'],
                 words: ['МАК', 'МАКАКА'],
-                instruction: "Module 2: Adding К (K). Now we can make more combinations! МАКАКА is monkey!",
+                instruction: "Adding К (K). Now we can make more combinations! МАКАКА is monkey!",
                 images: { 
                     'МАК': 'mac.jpg.png',
                     'МАКАКА': 'monkey.jpg.png'
@@ -758,7 +733,7 @@
             3: {
                 letters: ['М', 'А', 'К', 'О'],
                 words: ['КОМА', 'КАКАО', 'МОККО'],
-                instruction: "Module 3: Adding О (O). This Russian O sounds just like English O! КАКАО is cacao and МОККО is mocha!",
+                instruction: "Adding О (O). This Russian O sounds just like English O! КАКАО is cacao and МОККО is mocha!",
                 images: {
                     'КАКАО': 'cacao.jpg.png'
                 }
@@ -766,7 +741,7 @@
             4: {
                 letters: ['М', 'А', 'К', 'О', 'Т'],
                 words: ['КОТ', 'ТОМ', 'АТОМ', 'ТОМАТ', 'АТАКА', 'АКТ', 'ТАКТ', 'МОТО'],
-                instruction: "Module 4: Adding Т (T). Now we're building real words! КОТ means 'cat', ТОМ is the name 'Tom', ТОМАТ means 'tomato', АКТ means 'act', ТАКТ means 'tact', and МОТО means 'moto'.",
+                instruction: "Adding Т (T). Now we're building real words! КОТ means 'cat', ТОМ is the name 'Tom', ТОМАТ means 'tomato', АКТ means 'act', ТАКТ means 'tact', and МОТО means 'moto'.",
                 images: { 
                     'КОТ': 'cat.jpg.png',
                     'ТОМ': 'tom-cat.jpg.png',
@@ -777,13 +752,13 @@
             5: {
                 letters: ['М', 'А', 'К', 'О', 'Т', 'Е'],
                 words: ['МЕТА', 'ТЕМА', 'МЕМ', 'МЕККА', 'МАКЕТ', 'КОМЕТА'],
-                instruction: "Module 5: Adding Е (YE). Learn these advanced words! МЕМ means 'meme', МЕККА means 'Mecca', and МАКЕТ means 'maquette'.",
+                instruction: "Adding Е (YE). Learn these advanced words! МЕМ means 'meme', МЕККА means 'Mecca', and МАКЕТ means 'maquette'.",
                 images: { 'КОМЕТА': 'comet.jpg.png' }
             },
             6: {
                 letters: ['М', 'А', 'К', 'О', 'Т', 'Е'],
                 words: ['МА́МА', 'МЕ́ТА', 'ТЕ́МА', 'МЕ́ККА', 'МАКЕ́Т', 'МАКА́КА', 'АТА́КА', 'КОТ', 'ТОМ', 'АКТ', 'ТАКТ', 'ТОМА́Т', 'А́ТОМ', 'КО́МА', 'МО́ТО', 'МО́ККО'],
-                instruction: "Module 6: Stress Rules. Learn how stress changes pronunciation. Words with one vowel don't need stress marks. Notice how unstressed 'о' sounds like 'а', but stressed 'о' sounds like 'o' in 'orange'.",
+                instruction: "Stress Rules. Learn how stress changes pronunciation. Words with one vowel don't need stress marks. Notice how unstressed 'о' sounds like 'а', but stressed 'о' sounds like 'o' in 'orange'.",
                 images: {}
             }
         };
@@ -792,7 +767,6 @@
             learningStarted = true;
             document.getElementById('introSection').classList.add('hidden');
             document.getElementById('moduleSelector').classList.remove('hidden');
-            document.getElementById('lettersIntroduced').classList.remove('hidden');
             document.getElementById('instructionArea').classList.remove('hidden');
             document.getElementById('controlsArea').classList.remove('hidden');
             document.getElementById('navigationArea').classList.remove('hidden');
@@ -805,19 +779,26 @@
             updateLevelDisplay();
         }
 
+        function prevWord() {
+            if (currentWordIndex > 0) {
+                hideFeedback();
+                currentWordIndex--;
+                updateExerciseDisplay();
+                updateButtons();
+                updateProgress();
+            }
+        }
+
         function nextWord() {
             hideFeedback();
             
             currentWordIndex++;
             
             if (currentWordIndex >= modules[currentModule].words.length) {
-                // Module complete - check if there's next module
                 if (currentModule < Object.keys(modules).length) {
-                    // Go directly to next module
                     nextModule();
                     return;
                 } else {
-                    // All modules complete
                     showFinalCompletion();
                     moduleStarted = false;
                     updateButtons();
@@ -825,7 +806,6 @@
                 }
             }
             
-            // Regular next word
             updateExerciseDisplay();
             updateButtons();
             updateProgress();
@@ -850,10 +830,8 @@
             `;
             content.appendChild(congratulations);
             
-            // Mark group as completed
             markGroupCompleted(1);
             
-            // Enable next group button
             const nextGroupBtn = document.getElementById('nextGroupBtn');
             nextGroupBtn.style.opacity = '1';
             nextGroupBtn.style.pointerEvents = 'auto';
@@ -865,12 +843,10 @@
             
             if (moduleStarted && currentWordIndex < modules[currentModule].words.length) {
                 displayCurrentWord();
-                // Enable microphone immediately when word is displayed
                 document.getElementById('micBtn').disabled = false;
             }
         }
 
-        // Gamification Functions
         function addExp(points) {
             stats.exp += points;
             
@@ -907,14 +883,12 @@
         }
 
         function checkAchievements() {
-            // First word achievement
             if (stats.wordsPracticed === 1 && !stats.achievements.includes('firstWord')) {
                 stats.achievements.push('firstWord');
                 showAchievement(achievements.firstWord.icon, achievements.firstWord.title, achievements.firstWord.desc);
                 addExp(25);
             }
             
-            // Streak achievements
             if (stats.currentStreak === 5 && !stats.achievements.includes('streak5')) {
                 stats.achievements.push('streak5');
                 stats.badges.push('🔥 Fire Streak');
@@ -929,7 +903,6 @@
                 addExp(100);
             }
             
-            // Speed achievement
             if (stats.wordsPracticed === 20 && !stats.achievements.includes('speedDemon')) {
                 stats.achievements.push('speedDemon');
                 stats.badges.push('🚀 Speed Master');
@@ -937,13 +910,11 @@
                 addExp(75);
             }
             
-            // Update stats display with best streak
             if (stats.currentStreak > stats.bestStreak) {
                 stats.bestStreak = stats.currentStreak;
             }
         }
 
-        // Audio management
         function stopCurrentAudio() {
             if (currentAudio) {
                 currentAudio.pause();
@@ -1088,7 +1059,6 @@
             }
         }
 
-        // Speech recognition
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1139,10 +1109,7 @@
             }
 
             try {
-                recognition.abort();
-                setTimeout(() => {
-                    recognition.start();
-                }, 100);
+                recognition.start();
             } catch (error) {
                 console.error('Recognition start error:', error);
                 showFeedback('Could not start recording', 'error');
@@ -1258,19 +1225,23 @@
             const listenBtn = document.getElementById('listenBtn');
             const micBtn = document.getElementById('micBtn');
             const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
             
             if (!moduleStarted) {
                 listenBtn.disabled = true;
                 micBtn.disabled = true;
                 nextBtn.disabled = true;
+                prevBtn.disabled = true;
             } else if (currentWordIndex >= modules[currentModule].words.length) {
                 listenBtn.disabled = true;
                 micBtn.disabled = true;
                 nextBtn.disabled = true;
+                prevBtn.disabled = currentWordIndex === 0;
             } else {
                 listenBtn.disabled = false;
                 micBtn.disabled = false;
                 nextBtn.disabled = false;
+                prevBtn.disabled = currentWordIndex === 0;
                 listenBtn.textContent = '🔊 Listen';
             }
         }
@@ -1293,7 +1264,6 @@
             document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.module-btn')[moduleNum - 1].classList.add('active');
             
-            updateLettersDisplay();
             updateInstructionArea();
             resetWordDisplay();
             updateButtons();
@@ -1325,13 +1295,10 @@
             }
         }
 
-        function updateLettersDisplay() {
-            document.getElementById('currentLetters').textContent = modules[currentModule].letters.join('  ');
-        }
-
         function updateInstructionArea() {
             const instruction = document.getElementById('instructionArea');
-            instruction.querySelector('h3').textContent = `Module ${currentModule}`;
+            const moduleLetters = modules[currentModule].letters.join(', ');
+            instruction.querySelector('h3').textContent = moduleLetters;
             instruction.querySelector('p').textContent = modules[currentModule].instruction;
         }
 
@@ -1363,7 +1330,6 @@
             document.getElementById('feedback').classList.add('hidden');
         }
 
-        // Mark group as completed
         function markGroupCompleted(groupNumber) {
             const completedGroups = JSON.parse(localStorage.getItem('completedGroups') || '[]');
             if (!completedGroups.includes(groupNumber)) {
@@ -1372,7 +1338,6 @@
             }
         }
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initSpeechRecognition();
             console.log('Russian Learning Platform initialized');
