@@ -1133,8 +1133,43 @@
             const spokenClean = spoken.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '');
             const targetClean = target.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '');
             
+            // Exact match gets 100%
             if (spokenClean === targetClean) return 100;
             
+            // For very short words like "МАК", be more flexible
+            if (targetClean.length <= 3) {
+                // Check if spoken word contains all letters from target
+                const targetLetters = targetClean.split('');
+                const spokenLetters = spokenClean.split('');
+                
+                // If spoken word is similar length and contains target letters
+                if (Math.abs(spokenLetters.length - targetLetters.length) <= 1) {
+                    let matchingLetters = 0;
+                    for (let letter of targetLetters) {
+                        if (spokenLetters.includes(letter)) {
+                            matchingLetters++;
+                        }
+                    }
+                    
+                    // If most letters match, give a good score
+                    if (matchingLetters >= targetLetters.length - 1) {
+                        return Math.max(75, Math.round((matchingLetters / targetLetters.length) * 100));
+                    }
+                }
+                
+                // Special handling for common confusions
+                const commonConfusions = {
+                    'мак': ['маг', 'мат', 'бак', 'рак', 'лак', 'как'],
+                    'кот': ['код', 'рот', 'бот', 'тот'],
+                    'том': ['дом', 'ром', 'лом', 'сом']
+                };
+                
+                if (commonConfusions[targetClean] && commonConfusions[targetClean].includes(spokenClean)) {
+                    return 80; // Good score for common confusions
+                }
+            }
+            
+            // Standard Levenshtein distance calculation
             const matrix = [];
             const n = spokenClean.length;
             const m = targetClean.length;
