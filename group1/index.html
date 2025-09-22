@@ -1109,7 +1109,10 @@
             }
 
             try {
-                recognition.start();
+                recognition.abort();
+                setTimeout(() => {
+                    recognition.start();
+                }, 100);
             } catch (error) {
                 console.error('Recognition start error:', error);
                 showFeedback('Could not start recording', 'error');
