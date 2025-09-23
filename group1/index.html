@@ -1133,76 +1133,49 @@
         }
 
         function calculatePronunciationScore(spoken, target) {
-            const spokenClean = spoken.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '');
-            const targetClean = target.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '');
+            const spokenClean = spoken.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '').trim();
+            const targetClean = target.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '').trim();
+            
+            console.log(`Comparing: spoken="${spokenClean}" vs target="${targetClean}"`);
             
             // Exact match gets 100%
-            if (spokenClean === targetClean) return 100;
+            if (spokenClean === targetClean) {
+                console.log('Exact match found!');
+                return 100;
+            }
             
-            // For very short words like "МАК", be more flexible
-            if (targetClean.length <= 3) {
-                // Check if spoken word contains all letters from target
-                const targetLetters = targetClean.split('');
-                const spokenLetters = spokenClean.split('');
-                
-                // If spoken word is similar length and contains target letters
-                if (Math.abs(spokenLetters.length - targetLetters.length) <= 1) {
-                    let matchingLetters = 0;
-                    for (let letter of targetLetters) {
-                        if (spokenLetters.includes(letter)) {
-                            matchingLetters++;
-                        }
-                    }
-                    
-                    // If most letters match, give a good score
-                    if (matchingLetters >= targetLetters.length - 1) {
-                        return Math.max(75, Math.round((matchingLetters / targetLetters.length) * 100));
-                    }
-                }
-                
-                // Special handling for common confusions
-                const commonConfusions = {
-                    'мак': ['маг', 'мат', 'бак', 'рак', 'лак', 'как'],
-                    'кот': ['код', 'рот', 'бот', 'тот'],
-                    'том': ['дом', 'ром', 'лом', 'сом']
-                };
-                
-                if (commonConfusions[targetClean] && commonConfusions[targetClean].includes(spokenClean)) {
-                    return 80; // Good score for common confusions
+            // Check if spoken contains target or vice versa
+            if (spokenClean.includes(targetClean) || targetClean.includes(spokenClean)) {
+                console.log('Partial match found');
+                return 85;
+            }
+            
+            // Calculate similarity using simple character comparison
+            const maxLen = Math.max(spokenClean.length, targetClean.length);
+            if (maxLen === 0) return 0;
+            
+            let matches = 0;
+            const minLen = Math.min(spokenClean.length, targetClean.length);
+            
+            // Count matching characters in same positions
+            for (let i = 0; i < minLen; i++) {
+                if (spokenClean[i] === targetClean[i]) {
+                    matches++;
                 }
             }
             
-            // Standard Levenshtein distance calculation
-            const matrix = [];
-            const n = spokenClean.length;
-            const m = targetClean.length;
+            // Calculate similarity percentage
+            const similarity = (matches / maxLen) * 100;
+            console.log(`Character matches: ${matches}/${maxLen}, similarity: ${similarity}%`);
             
-            for (let i = 0; i <= n; i++) {
-                matrix[i] = [i];
-            }
-            for (let j = 0; j <= m; j++) {
-                matrix[0][j] = j;
-            }
+            // Length penalty - if lengths are very different, reduce score
+            const lengthDiff = Math.abs(spokenClean.length - targetClean.length);
+            const lengthPenalty = Math.min(lengthDiff * 10, 30); // Max 30% penalty
             
-            for (let i = 1; i <= n; i++) {
-                for (let j = 1; j <= m; j++) {
-                    if (spokenClean.charAt(i - 1) === targetClean.charAt(j - 1)) {
-                        matrix[i][j] = matrix[i - 1][j - 1];
-                    } else {
-                        matrix[i][j] = Math.min(
-                            matrix[i - 1][j - 1] + 1,
-                            matrix[i][j - 1] + 1,
-                            matrix[i - 1][j] + 1
-                        );
-                    }
-                }
-            }
+            const finalScore = Math.max(0, Math.round(similarity - lengthPenalty));
+            console.log(`Final score after length penalty: ${finalScore}%`);
             
-            const maxLen = Math.max(n, m);
-            if (maxLen === 0) return 100;
-            
-            const similarity = ((maxLen - matrix[n][m]) / maxLen) * 100;
-            return Math.max(0, Math.round(similarity));
+            return finalScore;
         }
 
         function showPronunciationScore(score, spoken, target) {
