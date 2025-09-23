@@ -1137,45 +1137,35 @@
             const targetClean = target.toLowerCase().replace(/[^\u0400-\u04FF\s]/g, '').trim();
             
             console.log(`Comparing: spoken="${spokenClean}" vs target="${targetClean}"`);
+            console.log(`Original spoken: "${spoken}"`);
+            console.log(`Original target: "${target}"`);
             
-            // Exact match gets 100%
+            // STRICT: Only exact match gets high score
             if (spokenClean === targetClean) {
-                console.log('Exact match found!');
+                console.log('EXACT MATCH - 100%');
                 return 100;
             }
             
-            // Check if spoken contains target or vice versa
-            if (spokenClean.includes(targetClean) || targetClean.includes(spokenClean)) {
-                console.log('Partial match found');
-                return 85;
-            }
-            
-            // Calculate similarity using simple character comparison
-            const maxLen = Math.max(spokenClean.length, targetClean.length);
-            if (maxLen === 0) return 0;
-            
-            let matches = 0;
-            const minLen = Math.min(spokenClean.length, targetClean.length);
-            
-            // Count matching characters in same positions
-            for (let i = 0; i < minLen; i++) {
-                if (spokenClean[i] === targetClean[i]) {
-                    matches++;
+            // For very close matches (1 character difference), give moderate score
+            if (Math.abs(spokenClean.length - targetClean.length) <= 1) {
+                let differences = 0;
+                const maxLen = Math.max(spokenClean.length, targetClean.length);
+                
+                for (let i = 0; i < maxLen; i++) {
+                    if (spokenClean[i] !== targetClean[i]) {
+                        differences++;
+                    }
+                }
+                
+                if (differences === 1) {
+                    console.log('ONE CHARACTER DIFFERENCE - 75%');
+                    return 75;
                 }
             }
             
-            // Calculate similarity percentage
-            const similarity = (matches / maxLen) * 100;
-            console.log(`Character matches: ${matches}/${maxLen}, similarity: ${similarity}%`);
-            
-            // Length penalty - if lengths are very different, reduce score
-            const lengthDiff = Math.abs(spokenClean.length - targetClean.length);
-            const lengthPenalty = Math.min(lengthDiff * 10, 30); // Max 30% penalty
-            
-            const finalScore = Math.max(0, Math.round(similarity - lengthPenalty));
-            console.log(`Final score after length penalty: ${finalScore}%`);
-            
-            return finalScore;
+            // Everything else gets low score
+            console.log('NO MATCH - 0%');
+            return 0;
         }
 
         function showPronunciationScore(score, spoken, target) {
