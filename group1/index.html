@@ -1066,11 +1066,6 @@
                 recognition.lang = 'ru-RU';
                 recognition.continuous = false;
                 recognition.interimResults = false;
-                recognition.maxAlternatives = 5; // Get multiple alternatives
-                
-                // Add more specific settings
-                recognition.serviceURI = '';
-                recognition.grammars = null;
 
                 recognition.onstart = () => {
                     isListening = true;
@@ -1082,49 +1077,26 @@
                 };
 
                 recognition.onresult = (event) => {
-                    console.log('Recognition results:', event.results);
+                    console.log('Recognition event:', event);
+                    console.log('Results length:', event.results.length);
                     
-                    // Check all alternatives, not just the first one
-                    for (let i = 0; i < event.results.length; i++) {
-                        for (let j = 0; j < event.results[i].length; j++) {
-                            const transcript = event.results[i][j].transcript.trim();
-                            const confidence = event.results[i][j].confidence;
-                            console.log(`Alternative ${j}: "${transcript}" (confidence: ${confidence})`);
-                        }
+                    if (event.results.length > 0) {
+                        const transcript = event.results[0][0].transcript.trim();
+                        console.log('Recognized transcript:', transcript);
+                        
+                        const currentWord = modules[currentModule].words[currentWordIndex];
+                        const score = calculatePronunciationScore(transcript, currentWord);
+                        showPronunciationScore(score, transcript, currentWord);
+                        showFeedback(`You said: "${transcript}"`, score >= 70 ? 'success' : 'error');
+                    } else {
+                        console.log('No results returned');
+                        showFeedback('No speech detected. Try again.', 'error');
                     }
-                    
-                    // Use the first result with highest confidence
-                    const transcript = event.results[0][0].transcript.trim();
-                    console.log('Final recognized text:', transcript);
-                    
-                    const currentWord = modules[currentModule].words[currentWordIndex];
-                    const score = calculatePronunciationScore(transcript, currentWord);
-                    showPronunciationScore(score, transcript, currentWord);
-                    showFeedback(`You said: "${transcript}"`, score >= 70 ? 'success' : 'error');
                 };
 
                 recognition.onerror = (event) => {
                     console.error('Speech recognition error:', event.error, event);
-                    let errorMessage = 'Could not recognize speech. ';
-                    
-                    switch(event.error) {
-                        case 'no-speech':
-                            errorMessage += 'No speech detected. Speak louder or closer to microphone.';
-                            break;
-                        case 'audio-capture':
-                            errorMessage += 'Microphone not working.';
-                            break;
-                        case 'not-allowed':
-                            errorMessage += 'Microphone permission denied.';
-                            break;
-                        case 'network':
-                            errorMessage += 'Network error.';
-                            break;
-                        default:
-                            errorMessage += 'Try again.';
-                    }
-                    
-                    showFeedback(errorMessage, 'error');
+                    showFeedback('Could not recognize speech. Try again.', 'error');
                     stopListening();
                 };
 
@@ -1132,24 +1104,6 @@
                     console.log('Speech recognition ended');
                     stopListening();
                 };
-                
-                recognition.onspeechstart = () => {
-                    console.log('Speech detected');
-                };
-                
-                recognition.onspeechend = () => {
-                    console.log('Speech ended');
-                };
-                
-                recognition.onaudiostart = () => {
-                    console.log('Audio capture started');
-                };
-                
-                recognition.onaudioend = () => {
-                    console.log('Audio capture ended');
-                };
-            } else {
-                console.error('Speech recognition not supported');
             }
         }
 
