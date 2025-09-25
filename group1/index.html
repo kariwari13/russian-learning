@@ -1122,13 +1122,22 @@
                 showFeedback('Speak now...', 'info');
                 debugLog('Speech Recognition started - listening for input');
                 
-                // Set timeout for automatic stop
+                // Set timeout for automatic stop with retry mechanism
                 recognitionTimeout = setTimeout(() => {
                     if (isListening && recognition) {
-                        debugLog('Recognition timeout reached - stopping recognition');
+                        debugLog('Recognition timeout reached - stopping and offering retry');
                         recognition.stop();
+                        
+                        // Show retry option for problematic words
+                        const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
+                        if (currentWord.length <= 3) {
+                            setTimeout(() => {
+                                showFeedback('Having trouble? Try speaking louder and clearer, or use the Skip option below.', 'info');
+                                addSkipButton();
+                            }, 1000);
+                        }
                     }
-                }, 6000);
+                }, 6000); // Extended timeout for short words
             };
 
             recognition.onresult = (event) => {
@@ -1205,43 +1214,33 @@
             recognition.onerror = (event) => {
                 debugLog(`Speech Recognition error: ${event.error} - ${event.message || 'no message'}`);
                 
-                let errorMessage = '';
-                
                 switch (event.error) {
                     case 'no-speech':
-                        errorMessage = 'No speech detected. Try again.';
+                        showFeedback('No speech detected. Try speaking louder and closer to the microphone.', 'error');
+                        addSkipButton();
                         break;
                     case 'audio-capture':
-                        errorMessage = 'Microphone not accessible. Check permissions.';
+                        showFeedback('Microphone not accessible. Check permissions and try again.', 'error');
                         break;
                     case 'not-allowed':
-                        errorMessage = 'Microphone permission denied.';
+                        showFeedback('Microphone permission denied. Please allow microphone access.', 'error');
                         break;
                     case 'network':
-                        errorMessage = 'Network error. Check connection.';
+                        showFeedback('Network error. Check your internet connection.', 'error');
                         break;
                     case 'aborted':
                         // Don't show error for intentional aborts
-                        stopListening();
-                        return;
+                        break;
                     default:
-                        errorMessage = 'Could not recognize speech. Try again.';
+                        showFeedback('Having trouble recognizing speech. You can skip this word if needed.', 'error');
+                        addSkipButton();
                 }
                 
-                showFeedback(errorMessage, 'error');
                 stopListening();
             };
 
             recognition.onend = () => {
                 debugLog('Speech Recognition ended');
-                
-                // If we're still marked as listening but recognition ended, 
-                // it means no results were captured
-                if (isListening) {
-                    debugLog('Recognition ended without results');
-                    showFeedback('No speech detected. Try speaking louder.', 'error');
-                }
-                
                 stopListening();
             };
             
@@ -1442,7 +1441,7 @@
             
             debugLog(`Score calculation: spoken="${spokenOriginal}" vs target="${targetClean}"`);
             
-            // Check for cross-language matches first
+            // Check for cross-language matches (Russian words recognized as English/Latin)
             const crossLangMatch = checkCrossLanguageMatch(spokenOriginal, targetClean);
             if (crossLangMatch > 0) {
                 debugLog(`CROSS-LANGUAGE MATCH - ${crossLangMatch}%`);
@@ -1459,13 +1458,6 @@
             if (spokenClean === targetClean) {
                 debugLog('PERFECT CYRILLIC MATCH - 100%');
                 return 100;
-            }
-            
-            // NEW: Check for syllable-based recognition for short problematic words
-            const syllableScore = checkSyllableMatch(spokenOriginal, spokenClean, targetClean);
-            if (syllableScore > 0) {
-                debugLog(`SYLLABLE MATCH - ${syllableScore}%`);
-                return syllableScore;
             }
             
             // Check for common recognition variations
@@ -1517,59 +1509,6 @@
             }
             
             debugLog('NO SIGNIFICANT MATCH - 0%');
-            return 0;
-        }
-
-        function checkSyllableMatch(spokenOriginal, spokenClean, targetClean) {
-            // Define syllable mappings for problematic words
-            const syllableWords = {
-                'мак': {
-                    syllables: ['ма', 'м'],
-                    englishSyllables: ['ma', 'm'],
-                    partialSyllables: ['мо', 'mo'] // common misrecognitions
-                },
-                'кот': {
-                    syllables: ['ко', 'к'],
-                    englishSyllables: ['ko', 'k', 'co'],
-                    partialSyllables: ['кo', 'ka', 'ка']
-                },
-                'том': {
-                    syllables: ['то', 'т'],
-                    englishSyllables: ['to', 't'],
-                    partialSyllables: ['та', 'ta']
-                }
-            };
-            
-            if (!syllableWords[targetClean]) {
-                return 0;
-            }
-            
-            const wordData = syllableWords[targetClean];
-            
-            // Check if spoken matches any expected syllables (Cyrillic)
-            for (const syllable of wordData.syllables) {
-                if (spokenClean === syllable) {
-                    debugLog(`Found Cyrillic syllable match: "${syllable}" for word "${targetClean}"`);
-                    return 85; // Good score for syllable recognition
-                }
-            }
-            
-            // Check if spoken matches any English syllables
-            for (const syllable of wordData.englishSyllables) {
-                if (spokenOriginal === syllable) {
-                    debugLog(`Found English syllable match: "${syllable}" for word "${targetClean}"`);
-                    return 85; // Good score for syllable recognition
-                }
-            }
-            
-            // Check partial syllables (common misrecognitions)
-            for (const syllable of wordData.partialSyllables) {
-                if (spokenClean === syllable || spokenOriginal === syllable) {
-                    debugLog(`Found partial syllable match: "${syllable}" for word "${targetClean}"`);
-                    return 75; // Decent score for partial recognition
-                }
-            }
-            
             return 0;
         }
 
