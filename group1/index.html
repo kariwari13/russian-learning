@@ -707,7 +707,6 @@
         let moduleStarted = false;
         let learningStarted = false;
         let recognitionTimeout = null;
-        let hasProcessedResult = false; // Track if we processed a result in current session
         
         // Statistics and Gamification
         let stats = {
@@ -1642,7 +1641,58 @@
             return 0;
         }
 
-        function generateVariations(word) {
+        function checkSyllableMatch(spokenOriginal, spokenClean, targetClean) {
+            // Define syllable mappings for problematic words
+            const syllableWords = {
+                'мак': {
+                    syllables: ['ма', 'м'],
+                    englishSyllables: ['ma', 'm'],
+                    partialSyllables: ['мо', 'mo'] // common misrecognitions
+                },
+                'кот': {
+                    syllables: ['ко', 'к'],
+                    englishSyllables: ['ko', 'k', 'co'],
+                    partialSyllables: ['кo', 'ka', 'ка']
+                },
+                'том': {
+                    syllables: ['то', 'т'],
+                    englishSyllables: ['to', 't'],
+                    partialSyllables: ['та', 'ta']
+                }
+            };
+            
+            if (!syllableWords[targetClean]) {
+                return 0;
+            }
+            
+            const wordData = syllableWords[targetClean];
+            
+            // Check if spoken matches any expected syllables (Cyrillic)
+            for (const syllable of wordData.syllables) {
+                if (spokenClean === syllable) {
+                    debugLog(`Found Cyrillic syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 85; // Good score for syllable recognition
+                }
+            }
+            
+            // Check if spoken matches any English syllables
+            for (const syllable of wordData.englishSyllables) {
+                if (spokenOriginal === syllable) {
+                    debugLog(`Found English syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 85; // Good score for syllable recognition
+                }
+            }
+            
+            // Check partial syllables (common misrecognitions)
+            for (const syllable of wordData.partialSyllables) {
+                if (spokenClean === syllable || spokenOriginal === syllable) {
+                    debugLog(`Found partial syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 75; // Decent score for partial recognition
+                }
+            }
+            
+            return 0;
+        }
             const variations = [];
             
             // Common Russian speech recognition variations
