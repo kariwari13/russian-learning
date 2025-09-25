@@ -1099,6 +1099,7 @@
             
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
                 debugLog('Speech Recognition API not supported in this browser');
+                showFeedback('Speech recognition not supported in this browser', 'error');
                 return;
             }
 
@@ -1109,7 +1110,7 @@
             recognition.lang = 'ru-RU';
             recognition.continuous = false;
             recognition.interimResults = true; // Enable interim results to catch short words
-            recognition.maxAlternatives = 5; // Get multiple alternatives
+            recognition.maxAlternatives = 10; // Increase alternatives for better detection
             
             debugLog('Speech Recognition configured with enhanced settings');
 
@@ -1135,8 +1136,9 @@
                 
                 let finalTranscript = '';
                 let interimTranscript = '';
+                let bestAlternatives = [];
                 
-                // Process all results (both interim and final)
+                // Process all results and collect alternatives
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const result = event.results[i];
                     debugLog(`Result ${i}: isFinal=${result.isFinal}, confidence=${result[0].confidence}, transcript="${result[0].transcript}"`);
@@ -1147,29 +1149,57 @@
                         interimTranscript += result[0].transcript;
                     }
                     
-                    // Log all alternatives for debugging
-                    for (let j = 0; j < result.length; j++) {
+                    // Collect all alternatives for better matching
+                    for (let j = 0; j < Math.min(result.length, 10); j++) {
+                        bestAlternatives.push({
+                            transcript: result[j].transcript.trim(),
+                            confidence: result[j].confidence,
+                            isFinal: result.isFinal
+                        });
                         debugLog(`  Alternative ${j}: "${result[j].transcript}" (confidence: ${result[j].confidence})`);
                     }
                 }
                 
-                // Process final result
-                if (finalTranscript) {
+                // Process final result if available
+                if (finalTranscript.trim()) {
                     const transcript = finalTranscript.trim();
-                    debugLog(`Final transcript received: "${transcript}"`);
+                    debugLog(`Processing final transcript: "${transcript}"`);
                     processRecognitionResult(transcript, event.results[event.results.length - 1]);
-                } else if (interimTranscript) {
-                    // For very short words, interim results might be all we get
-                    const transcript = interimTranscript.trim();
-                    debugLog(`Processing interim transcript: "${transcript}"`);
-                    
-                    // If interim result looks complete (short word), process it
-                    const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
-                    if (transcript.length >= currentWord.length - 1) {
-                        debugLog('Interim result appears complete - processing it');
-                        processRecognitionResult(transcript, event.results[event.results.length - 1]);
+                    return;
+                }
+                
+                // For short words like "МАК", check if any alternative matches
+                const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
+                debugLog(`Current target word: "${currentWord}"`);
+                
+                // Check all alternatives for potential matches
+                for (const alt of bestAlternatives) {
+                    if (alt.transcript) {
+                        const score = calculatePronunciationScore(alt.transcript, currentWord);
+                        debugLog(`Alternative "${alt.transcript}" scored: ${score}%`);
+                        
+                        if (score >= 80) {
+                            debugLog(`Found good match in alternatives: "${alt.transcript}"`);
+                            processRecognitionResult(alt.transcript, null);
+                            return;
+                        }
                     }
                 }
+                
+                // If interim result looks promising for short words
+                if (interimTranscript.trim()) {
+                    const transcript = interimTranscript.trim();
+                    debugLog(`Checking interim transcript: "${transcript}"`);
+                    
+                    const score = calculatePronunciationScore(transcript, currentWord);
+                    if (score >= 80 || transcript.length >= currentWord.length - 1) {
+                        debugLog(`Interim result looks good, processing: "${transcript}"`);
+                        processRecognitionResult(transcript, null);
+                        return;
+                    }
+                }
+                
+                debugLog('No suitable results found in this recognition event');
             };
 
             recognition.onerror = (event) => {
@@ -1254,7 +1284,28 @@
                     recognitionTimeout = null;
                 }
                 
-                debugLog('Attempting to start recognition');
+                // Special handling for problematic words
+                const currentWord = modules[currentModule].words[currentWordIndex];
+                const cleanWord = currentWord.replace(/́/g, '');
+                
+                debugLog(`Attempting to start recognition for word: "${cleanWord}"`);
+                
+                // For short words, try multiple language settings
+                if (cleanWord.length <= 3) {
+                    debugLog('Short word detected - using enhanced recognition');
+                    
+                    // Try with both Russian and multilingual recognition
+                    recognition.lang = 'ru-RU';
+                    
+                    // For very short words, also add English fallback
+                    setTimeout(() => {
+                        if (!isListening) {
+                            debugLog('First attempt failed, trying multilingual recognition');
+                            recognition.lang = 'ru';
+                        }
+                    }, 2000);
+                }
+                
                 recognition.abort(); // Ensure clean state
                 
                 setTimeout(() => {
