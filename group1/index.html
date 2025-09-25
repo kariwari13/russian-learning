@@ -1292,78 +1292,45 @@
             }
 
             try {
-                // Clear any existing timeout and skip button
+                // Clear any existing timeout
                 if (recognitionTimeout) {
                     clearTimeout(recognitionTimeout);
                     recognitionTimeout = null;
                 }
                 
-                const skipBtn = document.getElementById('skipBtn');
-                if (skipBtn) {
-                    skipBtn.remove();
-                }
-                
-                // Get current word info
+                // Special handling for problematic words
                 const currentWord = modules[currentModule].words[currentWordIndex];
                 const cleanWord = currentWord.replace(/́/g, '');
                 
-                debugLog(`Attempting to start recognition for word: "${cleanWord}" in module ${currentModule}`);
+                debugLog(`Attempting to start recognition for word: "${cleanWord}"`);
                 
-                // Adjust recognition settings based on word and module
-                setupRecognitionForWord(cleanWord, currentModule);
+                // For short words, try multiple language settings
+                if (cleanWord.length <= 3) {
+                    debugLog('Short word detected - using enhanced recognition');
+                    
+                    // Try with both Russian and multilingual recognition
+                    recognition.lang = 'ru-RU';
+                    
+                    // For very short words, also add English fallback
+                    setTimeout(() => {
+                        if (!isListening) {
+                            debugLog('First attempt failed, trying multilingual recognition');
+                            recognition.lang = 'ru';
+                        }
+                    }, 2000);
+                }
                 
                 recognition.abort(); // Ensure clean state
                 
                 setTimeout(() => {
                     debugLog('Starting recognition after cleanup delay');
-                    try {
-                        recognition.start();
-                    } catch (startError) {
-                        debugLog(`Recognition start failed: ${startError.message}`);
-                        showFeedback('Microphone issue. Try again or use skip option.', 'error');
-                        addSkipButton();
-                    }
-                }, 200);
+                    recognition.start();
+                }, 100);
                 
             } catch (error) {
                 debugLog(`Failed to start recognition: ${error.message}`);
-                showFeedback('Could not start recording. You can skip this word.', 'error');
-                addSkipButton();
+                showFeedback('Could not start recording', 'error');
             }
-        }
-
-        function setupRecognitionForWord(word, moduleNumber) {
-            // Base settings
-            recognition.lang = 'ru-RU';
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 15;
-            
-            // Special handling for problematic words
-            const problematicWords = ['мак', 'кот', 'том', 'акт'];
-            
-            if (problematicWords.includes(word.toLowerCase())) {
-                debugLog(`Problematic word detected: ${word} - using enhanced settings`);
-                
-                // Try different language codes for better recognition
-                if (Math.random() > 0.5) {
-                    recognition.lang = 'ru';
-                } else {
-                    recognition.lang = 'ru-RU';
-                }
-                
-                // Increase sensitivity for short words
-                recognition.maxAlternatives = 20;
-            }
-            
-            // Module-specific adjustments
-            if (moduleNumber === 6) { // Stress rules module
-                debugLog('Stress rules module - using relaxed settings');
-                recognition.lang = 'ru-RU';
-                recognition.maxAlternatives = 25; // Even more alternatives for stress words
-            }
-            
-            debugLog(`Recognition configured: lang=${recognition.lang}, maxAlternatives=${recognition.maxAlternatives}`);
         }
 
         function addSkipButton() {
