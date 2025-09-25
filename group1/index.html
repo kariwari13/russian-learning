@@ -1442,7 +1442,7 @@
             
             debugLog(`Score calculation: spoken="${spokenOriginal}" vs target="${targetClean}"`);
             
-            // Check for cross-language matches (Russian words recognized as English/Latin)
+            // Check for cross-language matches first
             const crossLangMatch = checkCrossLanguageMatch(spokenOriginal, targetClean);
             if (crossLangMatch > 0) {
                 debugLog(`CROSS-LANGUAGE MATCH - ${crossLangMatch}%`);
@@ -1459,6 +1459,13 @@
             if (spokenClean === targetClean) {
                 debugLog('PERFECT CYRILLIC MATCH - 100%');
                 return 100;
+            }
+            
+            // NEW: Check for syllable-based recognition for short problematic words
+            const syllableScore = checkSyllableMatch(spokenOriginal, spokenClean, targetClean);
+            if (syllableScore > 0) {
+                debugLog(`SYLLABLE MATCH - ${syllableScore}%`);
+                return syllableScore;
             }
             
             // Check for common recognition variations
@@ -1510,6 +1517,59 @@
             }
             
             debugLog('NO SIGNIFICANT MATCH - 0%');
+            return 0;
+        }
+
+        function checkSyllableMatch(spokenOriginal, spokenClean, targetClean) {
+            // Define syllable mappings for problematic words
+            const syllableWords = {
+                'мак': {
+                    syllables: ['ма', 'м'],
+                    englishSyllables: ['ma', 'm'],
+                    partialSyllables: ['мо', 'mo'] // common misrecognitions
+                },
+                'кот': {
+                    syllables: ['ко', 'к'],
+                    englishSyllables: ['ko', 'k', 'co'],
+                    partialSyllables: ['кo', 'ka', 'ка']
+                },
+                'том': {
+                    syllables: ['то', 'т'],
+                    englishSyllables: ['to', 't'],
+                    partialSyllables: ['та', 'ta']
+                }
+            };
+            
+            if (!syllableWords[targetClean]) {
+                return 0;
+            }
+            
+            const wordData = syllableWords[targetClean];
+            
+            // Check if spoken matches any expected syllables (Cyrillic)
+            for (const syllable of wordData.syllables) {
+                if (spokenClean === syllable) {
+                    debugLog(`Found Cyrillic syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 85; // Good score for syllable recognition
+                }
+            }
+            
+            // Check if spoken matches any English syllables
+            for (const syllable of wordData.englishSyllables) {
+                if (spokenOriginal === syllable) {
+                    debugLog(`Found English syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 85; // Good score for syllable recognition
+                }
+            }
+            
+            // Check partial syllables (common misrecognitions)
+            for (const syllable of wordData.partialSyllables) {
+                if (spokenClean === syllable || spokenOriginal === syllable) {
+                    debugLog(`Found partial syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 75; // Decent score for partial recognition
+                }
+            }
+            
             return 0;
         }
 
