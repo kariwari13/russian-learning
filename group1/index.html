@@ -1297,23 +1297,34 @@
         }
 
         function calculatePronunciationScore(spoken, target) {
-            // Remove stress marks and convert to lowercase for comparison
-            const spokenClean = spoken.toLowerCase()
-                .replace(/[^\u0400-\u04FF\s]/g, '') // Keep only Cyrillic and spaces
-                .replace(/\s+/g, '') // Remove all spaces
-                .trim();
+            // Clean up the spoken input
+            const spokenOriginal = spoken.toLowerCase().trim();
             
+            // Remove stress marks from target and convert to lowercase
             const targetClean = target.toLowerCase()
                 .replace(/́/g, '') // Remove stress marks
                 .replace(/[^\u0400-\u04FF\s]/g, '') // Keep only Cyrillic and spaces
                 .replace(/\s+/g, '') // Remove all spaces
                 .trim();
             
-            debugLog(`Score calculation: spoken="${spokenClean}" vs target="${targetClean}"`);
+            debugLog(`Score calculation: spoken="${spokenOriginal}" vs target="${targetClean}"`);
             
-            // Exact match gets perfect score
+            // Check for cross-language matches (Russian words recognized as English/Latin)
+            const crossLangMatch = checkCrossLanguageMatch(spokenOriginal, targetClean);
+            if (crossLangMatch > 0) {
+                debugLog(`CROSS-LANGUAGE MATCH - ${crossLangMatch}%`);
+                return crossLangMatch;
+            }
+            
+            // Clean spoken for Cyrillic-only comparison
+            const spokenClean = spokenOriginal
+                .replace(/[^\u0400-\u04FF\s]/g, '') // Keep only Cyrillic and spaces
+                .replace(/\s+/g, '') // Remove all spaces
+                .trim();
+            
+            // Exact Cyrillic match gets perfect score
             if (spokenClean === targetClean) {
-                debugLog('PERFECT MATCH - 100%');
+                debugLog('PERFECT CYRILLIC MATCH - 100%');
                 return 100;
             }
             
@@ -1326,9 +1337,18 @@
                 }
             }
             
+            // If no Cyrillic characters detected, check phonetic similarity
+            if (spokenClean.length === 0 && spokenOriginal.length > 0) {
+                const phoneticScore = checkPhoneticMatch(spokenOriginal, targetClean);
+                if (phoneticScore > 0) {
+                    debugLog(`PHONETIC MATCH - ${phoneticScore}%`);
+                    return phoneticScore;
+                }
+            }
+            
             // Length-based scoring for partial matches
             if (spokenClean.length === 0) {
-                debugLog('EMPTY INPUT - 0%');
+                debugLog('NO CYRILLIC INPUT - 0%');
                 return 0;
             }
             
@@ -1357,6 +1377,74 @@
             }
             
             debugLog('NO SIGNIFICANT MATCH - 0%');
+            return 0;
+        }
+
+        function checkCrossLanguageMatch(spoken, target) {
+            // Dictionary of Russian words that might be recognized as English/Latin equivalents
+            const crossLangMap = {
+                'мак': ['mac', 'mack', 'mak'],
+                'кот': ['cat', 'kot'],
+                'том': ['tom'],
+                'мама': ['mama', 'mamma'],
+                'какао': ['cacao', 'kakao'],
+                'атом': ['atom'],
+                'комета': ['comet', 'cometa'],
+                'акт': ['act', 'akt'],
+                'такт': ['tact', 'takt'],
+                'мото': ['moto', 'motto'],
+                'мета': ['meta'],
+                'тема': ['theme', 'tema'],
+                'мекка': ['mecca', 'mekka'],
+                'макет': ['maquette', 'maket']
+            };
+            
+            if (crossLangMap[target]) {
+                for (const variant of crossLangMap[target]) {
+                    if (spoken === variant) {
+                        debugLog(`Found cross-language match: ${spoken} -> ${target}`);
+                        return 100; // Perfect score for correct cross-language recognition
+                    }
+                    
+                    // Check for close matches
+                    const similarity = calculateStringSimilarity(spoken, variant);
+                    if (similarity > 0.8) {
+                        debugLog(`Close cross-language match: ${spoken} -> ${variant} (similarity: ${similarity})`);
+                        return Math.round(similarity * 95);
+                    }
+                }
+            }
+            
+            return 0;
+        }
+
+        function checkPhoneticMatch(spoken, target) {
+            // Simple phonetic matching for when speech recognition uses Latin characters
+            const phoneticMap = {
+                'м': 'm',
+                'а': 'a',
+                'к': 'k',
+                'о': 'o',
+                'т': 't',
+                'е': 'e'
+            };
+            
+            let phoneticTarget = '';
+            for (const char of target) {
+                phoneticTarget += phoneticMap[char] || char;
+            }
+            
+            debugLog(`Phonetic comparison: ${spoken} vs ${phoneticTarget}`);
+            
+            if (spoken === phoneticTarget) {
+                return 90; // High score for phonetic match
+            }
+            
+            const similarity = calculateStringSimilarity(spoken, phoneticTarget);
+            if (similarity > 0.7) {
+                return Math.round(similarity * 80);
+            }
+            
             return 0;
         }
 
