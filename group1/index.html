@@ -411,6 +411,22 @@
             border: 1px solid #99ccff;
         }
 
+        .debug-panel {
+            display: none; /* Hide debug panel from users */
+        }
+
+        .debug-panel h4 {
+            margin-bottom: 10px;
+            font-family: inherit;
+            color: #5f6368;
+        }
+
+        .debug-log {
+            color: #5f6368;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
         .navigation {
             display: flex;
             justify-content: space-between;
@@ -602,8 +618,14 @@
                 </div>
 
                 <div class="current-word" id="currentWord">Ready to Start</div>
-                
+              
                 <img class="word-image hidden" id="wordImage" alt="Word illustration">
+
+                <!-- Debug Panel -->
+                <div class="debug-panel hidden" id="debugPanel">
+                    <h4>Speech Recognition Debug:</h4>
+                    <div class="debug-log" id="debugLog">Waiting for speech input...</div>
+                </div>
 
                 <!-- Pronunciation Score -->
                 <div class="pronunciation-score hidden" id="pronunciationScore">
@@ -630,7 +652,7 @@
                         <div class="exp-fill" id="expFill"></div>
                     </div>
                 </div>
-                
+              
                 <div class="stats-panel hidden" id="statsPanel">
                     <h4>Your Progress</h4>
                     <div class="stats-row">
@@ -685,7 +707,7 @@
         let moduleStarted = false;
         let learningStarted = false;
         let recognitionTimeout = null;
-        
+      
         // Statistics and Gamification
         let stats = {
             wordsPracticed: 0,
@@ -764,6 +786,17 @@
             }
         };
 
+        // Debug logging function
+        function debugLog(message) {
+            console.log(message);
+            const debugLogElement = document.getElementById('debugLog');
+            if (debugLogElement) {
+                const timestamp = new Date().toLocaleTimeString();
+                debugLogElement.textContent += `[${timestamp}] ${message}\n`;
+                debugLogElement.scrollTop = debugLogElement.scrollHeight;
+            }
+        }
+
         function startLearning() {
             learningStarted = true;
             document.getElementById('introSection').classList.add('hidden');
@@ -774,98 +807,11 @@
             document.getElementById('statsPanel').classList.remove('hidden');
             document.getElementById('levelProgress').classList.remove('hidden');
             document.getElementById('groupNavigation').classList.remove('hidden');
-            
+            document.getElementById('debugPanel').classList.remove('hidden');
+          
             selectModule(1);
             updateStats();
             updateLevelDisplay();
-        }
-
-        function selectModule(moduleNum) {
-            currentModule = moduleNum;
-            currentWordIndex = 0;
-            moduleStarted = true;
-            
-            document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.module-btn')[moduleNum - 1].classList.add('active');
-            
-            updateInstructionArea();
-            resetWordDisplay();
-            updateButtons();
-            updateProgress();
-            updateExerciseDisplay();
-            
-            if (moduleNum === 6) {
-                document.getElementById('stressExplanation').classList.remove('hidden');
-            } else {
-                document.getElementById('stressExplanation').classList.add('hidden');
-            }
-        }
-
-        function updateInstructionArea() {
-            const instruction = document.getElementById('instructionArea');
-            const moduleLetters = modules[currentModule].letters.join(', ');
-            instruction.querySelector('h3').textContent = moduleLetters;
-            instruction.querySelector('p').textContent = modules[currentModule].instruction;
-        }
-
-        function resetWordDisplay() {
-            document.getElementById('currentWord').textContent = 'Ready to Start';
-            document.getElementById('wordImage').classList.add('hidden');
-            hideFeedback();
-        }
-
-        function updateExerciseDisplay() {
-            const pronunciationScore = document.getElementById('pronunciationScore');
-            pronunciationScore.classList.remove('hidden');
-            
-            if (moduleStarted && currentWordIndex < modules[currentModule].words.length) {
-                displayCurrentWord();
-                document.getElementById('micBtn').disabled = false;
-            }
-        }
-
-        function displayCurrentWord() {
-            const word = modules[currentModule].words[currentWordIndex];
-            document.getElementById('currentWord').textContent = word;
-            
-            const wordImage = document.getElementById('wordImage');
-            if (modules[currentModule].images[word]) {
-                wordImage.src = imageBaseUrl + modules[currentModule].images[word];
-                wordImage.classList.remove('hidden');
-                
-                wordImage.onerror = () => {
-                    console.log('Image failed to load:', imageBaseUrl + modules[currentModule].images[word]);
-                    wordImage.classList.add('hidden');
-                };
-            } else {
-                wordImage.classList.add('hidden');
-            }
-        }
-
-        function updateProgress() {
-            if (!moduleStarted) {
-                document.getElementById('progressFill').style.width = '0%';
-                return;
-            }
-            
-            const totalWords = modules[currentModule].words.length;
-            const progress = (currentWordIndex / totalWords) * 100;
-            document.getElementById('progressFill').style.width = `${progress}%`;
-        }
-
-        function updateButtons() {
-            const listenBtn = document.getElementById('listenBtn');
-            const micBtn = document.getElementById('micBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const prevBtn = document.getElementById('prevBtn');
-            
-            if (!moduleStarted) {
-                listenBtn.disabled = false;
-                micBtn.disabled = false;
-                nextBtn.disabled = false;
-                prevBtn.disabled = currentWordIndex === 0;
-                listenBtn.textContent = '🔊 Listen';
-            }
         }
 
         function prevWord() {
@@ -880,9 +826,9 @@
 
         function nextWord() {
             hideFeedback();
-            
+          
             currentWordIndex++;
-            
+          
             if (currentWordIndex >= modules[currentModule].words.length) {
                 if (currentModule < Object.keys(modules).length) {
                     nextModule();
@@ -894,7 +840,7 @@
                     return;
                 }
             }
-            
+          
             updateExerciseDisplay();
             updateButtons();
             updateProgress();
@@ -918,30 +864,90 @@
                 <a href="../group2/index.html" class="control-btn" style="margin-top: 15px; text-decoration: none;">Continue to Group 2 →</a>
             `;
             content.appendChild(congratulations);
-            
+          
             markGroupCompleted(1);
-            
+          
             const nextGroupBtn = document.getElementById('nextGroupBtn');
             nextGroupBtn.style.opacity = '1';
             nextGroupBtn.style.pointerEvents = 'auto';
         }
 
-        function markGroupCompleted(groupNumber) {
-            const completedGroups = JSON.parse(localStorage.getItem('completedGroups') || '[]');
-            if (!completedGroups.includes(groupNumber)) {
-                completedGroups.push(groupNumber);
-                localStorage.setItem('completedGroups', JSON.stringify(completedGroups));
+        function updateExerciseDisplay() {
+            const pronunciationScore = document.getElementById('pronunciationScore');
+            pronunciationScore.classList.remove('hidden');
+          
+            if (moduleStarted && currentWordIndex < modules[currentModule].words.length) {
+                displayCurrentWord();
+                document.getElementById('micBtn').disabled = false;
             }
         }
 
-        function playCurrentWord() {
-            if (!moduleStarted || currentWordIndex >= modules[currentModule].words.length) {
-                return;
+        function addExp(points) {
+            stats.exp += points;
+          
+            const expNeeded = stats.level * 100;
+            if (stats.exp >= expNeeded) {
+                stats.level++;
+                stats.exp = stats.exp - expNeeded;
+                showAchievement('🆙', 'Level Up!', `Welcome to Level ${stats.level}!`);
             }
-            
-            const word = modules[currentModule].words[currentWordIndex];
-            displayCurrentWord();
-            playTextToSpeech(word);
+          
+            updateLevelDisplay();
+        }
+
+        function updateLevelDisplay() {
+            document.getElementById('currentLevel').textContent = stats.level;
+            const expNeeded = stats.level * 100;
+            document.getElementById('levelExp').textContent = `${stats.exp}/${expNeeded} XP`;
+          
+            const expPercent = (stats.exp / expNeeded) * 100;
+            document.getElementById('expFill').style.width = expPercent + '%';
+        }
+
+        function showAchievement(icon, title, description) {
+            const popup = document.getElementById('achievementPopup');
+            document.getElementById('achievementTitle').textContent = title;
+            document.getElementById('achievementDesc').textContent = description;
+            popup.querySelector('.achievement-icon').textContent = icon;
+          
+            popup.classList.remove('hidden');
+          
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 3000);
+        }
+
+        function checkAchievements() {
+            if (stats.wordsPracticed === 1 && !stats.achievements.includes('firstWord')) {
+                stats.achievements.push('firstWord');
+                showAchievement(achievements.firstWord.icon, achievements.firstWord.title, achievements.firstWord.desc);
+                addExp(25);
+            }
+          
+            if (stats.currentStreak === 5 && !stats.achievements.includes('streak5')) {
+                stats.achievements.push('streak5');
+                stats.badges.push('🔥 Fire Streak');
+                showAchievement(achievements.streak5.icon, achievements.streak5.title, achievements.streak5.desc);
+                addExp(50);
+            }
+          
+            if (stats.currentStreak === 10 && !stats.achievements.includes('streak10')) {
+                stats.achievements.push('streak10');
+                stats.badges.push('⚡ Lightning Fast');
+                showAchievement(achievements.streak10.icon, achievements.streak10.title, achievements.streak10.desc);
+                addExp(100);
+            }
+          
+            if (stats.wordsPracticed === 20 && !stats.achievements.includes('speedDemon')) {
+                stats.achievements.push('speedDemon');
+                stats.badges.push('🚀 Speed Master');
+                showAchievement(achievements.speedDemon.icon, achievements.speedDemon.title, achievements.speedDemon.desc);
+                addExp(75);
+            }
+          
+            if (stats.currentStreak > stats.bestStreak) {
+                stats.bestStreak = stats.currentStreak;
+            }
         }
 
         function stopCurrentAudio() {
@@ -969,33 +975,43 @@
             try {
                 stopCurrentAudio();
                 showStopButton();
-                
+              
                 const cleanText = text.replace(/́/g, '').toLowerCase();
                 const audioUrl = `${audioBaseUrl}${cleanText}.mp3`;
-                
+                debugLog(`Attempting to play audio: ${audioUrl}`);
+              
                 await playCustomAudio(audioUrl, text);
-                
+              
             } catch (error) {
-                console.error('Audio playback error:', error);
+                debugLog(`Audio playback error: ${error.message}`);
                 await playWebSpeechTTS(text);
             }
         }
 
         async function playCustomAudio(audioUrl, text) {
             return new Promise((resolve, reject) => {
+                debugLog(`Loading custom audio for: ${text}`);
+              
                 currentAudio = new Audio(audioUrl);
-                
+              
+                currentAudio.onloadeddata = () => {
+                    debugLog(`Custom audio loaded successfully: ${text}`);
+                };
+              
                 currentAudio.onended = () => {
+                    debugLog(`Custom audio playback completed: ${text}`);
                     hideStopButton();
                     resolve();
                 };
-                
+              
                 currentAudio.onerror = (e) => {
+                    debugLog(`Custom audio failed to load: ${text}, falling back to Web Speech`);
                     hideStopButton();
                     playWebSpeechTTS(text).then(resolve).catch(reject);
                 };
-                
+              
                 currentAudio.play().catch((playError) => {
+                    debugLog(`Audio play failed: ${text}, error: ${playError.message}`);
                     hideStopButton();
                     playWebSpeechTTS(text).then(resolve).catch(reject);
                 });
@@ -1027,33 +1043,36 @@
                 });
 
                 const utterance = new SpeechSynthesisUtterance(text);
-                
+              
                 utterance.lang = 'ru-RU';
                 utterance.rate = 0.8;
                 utterance.pitch = 1.0;
                 utterance.volume = 1.0;
-                
+              
                 const voices = speechSynthesis.getVoices();
                 const russianVoices = voices.filter(voice => 
                     voice.lang === 'ru-RU' ||
                     voice.lang.startsWith('ru-') ||
                     voice.name.toLowerCase().includes('russian')
                 );
-                
+              
                 const selectedVoice = russianVoices.find(v => 
                     v.name.toLowerCase().includes('google')
                 ) || russianVoices[0];
-                
+              
                 if (selectedVoice) {
                     utterance.voice = selectedVoice;
+                    debugLog(`Using Web Speech voice: ${selectedVoice.name}`);
                 }
 
+                utterance.onstart = () => debugLog('Web Speech TTS started');
                 utterance.onend = () => {
+                    debugLog('Web Speech TTS completed');
                     hideStopButton();
                 };
                 utterance.onerror = (event) => {
                     if (event.error !== 'interrupted') {
-                        console.error('Web Speech TTS error:', event.error);
+                        debugLog(`Web Speech TTS error: ${event.error}`);
                     }
                     hideStopButton();
                 };
@@ -1069,26 +1088,31 @@
                 speechSynthesis.speak(utterance);
 
             } catch (error) {
-                console.error('Web Speech TTS failed:', error.message);
+                debugLog(`Web Speech TTS failed: ${error.message}`);
                 hideStopButton();
                 throw error;
             }
         }
 
-        // Speech Recognition Functions
         function initSpeechRecognition() {
+            debugLog('Initializing Speech Recognition...');
+          
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                console.log('Speech Recognition API not supported in this browser');
+                debugLog('Speech Recognition API not supported in this browser');
+                showFeedback('Speech recognition not supported in this browser', 'error');
                 return;
             }
 
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
-            
+          
+            // Enhanced configuration for better short word recognition
             recognition.lang = 'ru-RU';
             recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 10;
+            recognition.interimResults = true; // Enable interim results to catch short words
+            recognition.maxAlternatives = 10; // Increase alternatives for better detection
+          
+            debugLog('Speech Recognition configured with enhanced settings');
 
             recognition.onstart = () => {
                 isListening = true;
@@ -1096,43 +1120,93 @@
                 micBtn.classList.add('listening');
                 micBtn.textContent = '🎤 Listening...';
                 showFeedback('Speak now...', 'info');
-                
+                debugLog('Speech Recognition started - listening for input');
+              
+                // Set timeout for automatic stop
                 recognitionTimeout = setTimeout(() => {
                     if (isListening && recognition) {
+                        debugLog('Recognition timeout reached - stopping recognition');
                         recognition.stop();
                     }
-                }, 5000);
+                }, 6000);
             };
 
             recognition.onresult = (event) => {
+                debugLog(`Recognition result event fired - results.length: ${event.results.length}`);
+              
                 let finalTranscript = '';
                 let interimTranscript = '';
-                
+                let bestAlternatives = [];
+              
+                // Process all results and collect alternatives
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const result = event.results[i];
-                    
+                    debugLog(`Result ${i}: isFinal=${result.isFinal}, confidence=${result[0].confidence}, transcript="${result[0].transcript}"`);
+                  
                     if (result.isFinal) {
                         finalTranscript += result[0].transcript;
                     } else {
                         interimTranscript += result[0].transcript;
                     }
-                }
-                
-                if (finalTranscript) {
-                    const transcript = finalTranscript.trim();
-                    processRecognitionResult(transcript, event.results[event.results.length - 1]);
-                } else if (interimTranscript) {
-                    const transcript = interimTranscript.trim();
-                    const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
-                    if (transcript.length >= currentWord.length - 1) {
-                        processRecognitionResult(transcript, event.results[event.results.length - 1]);
+                  
+                    // Collect all alternatives for better matching
+                    for (let j = 0; j < Math.min(result.length, 10); j++) {
+                        bestAlternatives.push({
+                            transcript: result[j].transcript.trim(),
+                            confidence: result[j].confidence,
+                            isFinal: result.isFinal
+                        });
+                        debugLog(`  Alternative ${j}: "${result[j].transcript}" (confidence: ${result[j].confidence})`);
                     }
                 }
+              
+                // Process final result if available
+                if (finalTranscript.trim()) {
+                    const transcript = finalTranscript.trim();
+                    debugLog(`Processing final transcript: "${transcript}"`);
+                    processRecognitionResult(transcript, event.results[event.results.length - 1]);
+                    return;
+                }
+              
+                // For short words like "МАК", check if any alternative matches
+                const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
+                debugLog(`Current target word: "${currentWord}"`);
+              
+                // Check all alternatives for potential matches
+                for (const alt of bestAlternatives) {
+                    if (alt.transcript) {
+                        const score = calculatePronunciationScore(alt.transcript, currentWord);
+                        debugLog(`Alternative "${alt.transcript}" scored: ${score}%`);
+                      
+                        if (score >= 80) {
+                            debugLog(`Found good match in alternatives: "${alt.transcript}"`);
+                            processRecognitionResult(alt.transcript, null);
+                            return;
+                        }
+                    }
+                }
+              
+                // If interim result looks promising for short words
+                if (interimTranscript.trim()) {
+                    const transcript = interimTranscript.trim();
+                    debugLog(`Checking interim transcript: "${transcript}"`);
+                  
+                    const score = calculatePronunciationScore(transcript, currentWord);
+                    if (score >= 80 || transcript.length >= currentWord.length - 1) {
+                        debugLog(`Interim result looks good, processing: "${transcript}"`);
+                        processRecognitionResult(transcript, null);
+                        return;
+                    }
+                }
+              
+                debugLog('No suitable results found in this recognition event');
             };
 
             recognition.onerror = (event) => {
+                debugLog(`Speech Recognition error: ${event.error} - ${event.message || 'no message'}`);
+              
                 let errorMessage = '';
-                
+              
                 switch (event.error) {
                     case 'no-speech':
                         errorMessage = 'No speech detected. Try again.';
@@ -1147,83 +1221,47 @@
                         errorMessage = 'Network error. Check connection.';
                         break;
                     case 'aborted':
+                        // Don't show error for intentional aborts
                         stopListening();
                         return;
                     default:
                         errorMessage = 'Could not recognize speech. Try again.';
                 }
-                
+              
                 showFeedback(errorMessage, 'error');
                 stopListening();
             };
 
             recognition.onend = () => {
+                debugLog('Speech Recognition ended');
+              
+                // If we're still marked as listening but recognition ended, 
+                // it means no results were captured
+                if (isListening) {
+                    debugLog('Recognition ended without results');
+                    showFeedback('No speech detected. Try speaking louder.', 'error');
+                }
+              
                 stopListening();
             };
-        }
-
-        function startRecording() {
-            if (!recognition) {
-                showFeedback('Speech recognition not available', 'error');
-                return;
-            }
-
-            if (isListening) {
-                recognition.stop();
-                return;
-            }
-
-            try {
-                if (recognitionTimeout) {
-                    clearTimeout(recognitionTimeout);
-                    recognitionTimeout = null;
-                }
-                
-                recognition.abort();
-                
-                setTimeout(() => {
-                    try {
-                        recognition.start();
-                    } catch (startError) {
-                        console.error('Recognition start failed:', startError.message);
-                        showFeedback('Microphone issue. Try again.', 'error');
-                    }
-                }, 200);
-                
-            } catch (error) {
-                console.error('Failed to start recognition:', error.message);
-                showFeedback('Could not start recording', 'error');
-            }
-        }
-
-        function stopListening() {
-            if (recognitionTimeout) {
-                clearTimeout(recognitionTimeout);
-                recognitionTimeout = null;
-            }
-            
-            isListening = false;
-            const micBtn = document.getElementById('micBtn');
-            micBtn.classList.remove('listening');
-            micBtn.textContent = '🎤 Speak';
-            
-            setTimeout(() => {
-                hideFeedback();
-                micBtn.disabled = false;
-            }, 1500);
+          
+            debugLog('Speech Recognition initialization complete');
         }
 
         function processRecognitionResult(transcript, result) {
             const currentWord = modules[currentModule].words[currentWordIndex];
-            
+            debugLog(`Processing recognition result: spoken="${transcript}" vs target="${currentWord}"`);
+          
+            // Calculate score using all alternatives if available
             let bestScore = 0;
             let bestMatch = transcript;
-            
+          
             if (result) {
                 for (let i = 0; i < result.length; i++) {
                     const alternative = result[i].transcript.trim();
                     const score = calculatePronunciationScore(alternative, currentWord);
-                    
+                    debugLog(`Alternative ${i}: "${alternative}" -> score: ${score}%`);
+                  
                     if (score > bestScore) {
                         bestScore = score;
                         bestMatch = alternative;
@@ -1232,61 +1270,311 @@
             } else {
                 bestScore = calculatePronunciationScore(transcript, currentWord);
             }
-            
+          
+            debugLog(`Best match: "${bestMatch}" with score: ${bestScore}%`);
+          
             showPronunciationScore(bestScore, bestMatch, currentWord);
             showFeedback(`You said: "${bestMatch}"`, bestScore >= 80 ? 'success' : 'error');
         }
 
+        function startRecording() {
+            debugLog('Start recording button clicked');
+          
+            if (!recognition) {
+                debugLog('Recognition not initialized');
+                showFeedback('Speech recognition not available', 'error');
+                return;
+            }
+
+            if (isListening) {
+                debugLog('Already listening - stopping current session');
+                recognition.stop();
+                return;
+            }
+
+            try {
+                // Clear any existing timeout and skip button
+                if (recognitionTimeout) {
+                    clearTimeout(recognitionTimeout);
+                    recognitionTimeout = null;
+                }
+              
+                const skipBtn = document.getElementById('skipBtn');
+                if (skipBtn) {
+                    skipBtn.remove();
+                }
+              
+                // Get current word info
+                const currentWord = modules[currentModule].words[currentWordIndex];
+                const cleanWord = currentWord.replace(/́/g, '');
+              
+                debugLog(`Attempting to start recognition for word: "${cleanWord}" in module ${currentModule}`);
+              
+                // Adjust recognition settings based on word and module
+                setupRecognitionForWord(cleanWord, currentModule);
+              
+                recognition.abort(); // Ensure clean state
+              
+                setTimeout(() => {
+                    debugLog('Starting recognition after cleanup delay');
+                    try {
+                        recognition.start();
+                    } catch (startError) {
+                        debugLog(`Recognition start failed: ${startError.message}`);
+                        showFeedback('Microphone issue. Try again or use skip option.', 'error');
+                        addSkipButton();
+                    }
+                }, 200);
+              
+            } catch (error) {
+                debugLog(`Failed to start recognition: ${error.message}`);
+                showFeedback('Could not start recording. You can skip this word.', 'error');
+                addSkipButton();
+            }
+        }
+
+        function setupRecognitionForWord(word, moduleNumber) {
+            // Base settings
+            recognition.lang = 'ru-RU';
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 15;
+          
+            // Special handling for problematic words
+            const problematicWords = ['мак', 'кот', 'том', 'акт'];
+          
+            if (problematicWords.includes(word.toLowerCase())) {
+                debugLog(`Problematic word detected: ${word} - using enhanced settings`);
+              
+                // Try different language codes for better recognition
+                if (Math.random() > 0.5) {
+                    recognition.lang = 'ru';
+                } else {
+                    recognition.lang = 'ru-RU';
+                }
+              
+                // Increase sensitivity for short words
+                recognition.maxAlternatives = 20;
+            }
+          
+            // Module-specific adjustments
+            if (moduleNumber === 6) { // Stress rules module
+                debugLog('Stress rules module - using relaxed settings');
+                recognition.lang = 'ru-RU';
+                recognition.maxAlternatives = 25; // Even more alternatives for stress words
+            }
+          
+            debugLog(`Recognition configured: lang=${recognition.lang}, maxAlternatives=${recognition.maxAlternatives}`);
+        }
+
+        function addSkipButton() {
+            // Remove existing skip button if present
+            const existingSkipBtn = document.getElementById('skipBtn');
+            if (existingSkipBtn) {
+                existingSkipBtn.remove();
+            }
+          
+            // Add skip button after controls
+            const controlsArea = document.getElementById('controlsArea');
+            const skipBtn = document.createElement('button');
+            skipBtn.id = 'skipBtn';
+            skipBtn.className = 'control-btn';
+            skipBtn.style.background = '#6c757d';
+            skipBtn.innerHTML = '⏭️ Skip Word';
+            skipBtn.onclick = skipCurrentWord;
+          
+            controlsArea.appendChild(skipBtn);
+        }
+
+        function skipCurrentWord() {
+            debugLog('User chose to skip word');
+          
+            // Remove skip button
+            const skipBtn = document.getElementById('skipBtn');
+            if (skipBtn) {
+                skipBtn.remove();
+            }
+          
+            // Give partial score for skipping
+            showPronunciationScore(60, 'skipped', modules[currentModule].words[currentWordIndex]);
+            showFeedback('Word skipped. Try to practice this word later!', 'info');
+          
+            // Enable next button
+            setTimeout(() => {
+                document.getElementById('nextBtn').disabled = false;
+            }, 1000);
+        }
+
+        function stopListening() {
+            debugLog('Stopping listening');
+          
+            if (recognitionTimeout) {
+                clearTimeout(recognitionTimeout);
+                recognitionTimeout = null;
+            }
+          
+            isListening = false;
+            const micBtn = document.getElementById('micBtn');
+            micBtn.classList.remove('listening');
+            micBtn.textContent = '🎤 Speak';
+          
+            // Remove skip button when stopping normally
+            const skipBtn = document.getElementById('skipBtn');
+            if (skipBtn) {
+                skipBtn.remove();
+            }
+          
+            setTimeout(() => {
+                micBtn.disabled = false;
+            }, 500);
+        }
+
         function calculatePronunciationScore(spoken, target) {
+            // Clean up the spoken input
             const spokenOriginal = spoken.toLowerCase().trim();
-            
+          
+            // Remove stress marks from target and convert to lowercase
             const targetClean = target.toLowerCase()
-                .replace(/́/g, '')
-                .replace(/[^\u0400-\u04FF\s]/g, '')
-                .replace(/\s+/g, '')
+                .replace(/́/g, '') // Remove stress marks
+                .replace(/[^\u0400-\u04FF\s]/g, '') // Keep only Cyrillic and spaces
+                .replace(/\s+/g, '') // Remove all spaces
                 .trim();
-            
+          
+            debugLog(`Score calculation: spoken="${spokenOriginal}" vs target="${targetClean}"`);
+          
             // Check for cross-language matches first
             const crossLangMatch = checkCrossLanguageMatch(spokenOriginal, targetClean);
             if (crossLangMatch > 0) {
+                debugLog(`CROSS-LANGUAGE MATCH - ${crossLangMatch}%`);
                 return crossLangMatch;
             }
-            
+          
+            // Clean spoken for Cyrillic-only comparison
             const spokenClean = spokenOriginal
-                .replace(/[^\u0400-\u04FF\s]/g, '')
-                .replace(/\s+/g, '')
+                .replace(/[^\u0400-\u04FF\s]/g, '') // Keep only Cyrillic and spaces
+                .replace(/\s+/g, '') // Remove all spaces
                 .trim();
-            
+          
             // Exact Cyrillic match gets perfect score
             if (spokenClean === targetClean) {
+                debugLog('PERFECT CYRILLIC MATCH - 100%');
                 return 100;
             }
-            
-            // Check for syllable-based recognition for short problematic words
+          
+            // NEW: Check for syllable-based recognition for short problematic words
             const syllableScore = checkSyllableMatch(spokenOriginal, spokenClean, targetClean);
             if (syllableScore > 0) {
+                debugLog(`SYLLABLE MATCH - ${syllableScore}%`);
                 return syllableScore;
             }
-            
+          
+            // Check for common recognition variations
+            const variations = generateVariations(targetClean);
+            for (const variation of variations) {
+                if (spokenClean === variation) {
+                    debugLog(`VARIATION MATCH: "${variation}" - 95%`);
+                    return 95;
+                }
+            }
+          
             // If no Cyrillic characters detected, check phonetic similarity
             if (spokenClean.length === 0 && spokenOriginal.length > 0) {
                 const phoneticScore = checkPhoneticMatch(spokenOriginal, targetClean);
                 if (phoneticScore > 0) {
+                    debugLog(`PHONETIC MATCH - ${phoneticScore}%`);
                     return phoneticScore;
                 }
             }
-            
+          
+            // Length-based scoring for partial matches
+            if (spokenClean.length === 0) {
+                debugLog('NO CYRILLIC INPUT - 0%');
+                return 0;
+            }
+          
             // For very short words, be more lenient
             if (targetClean.length <= 3) {
                 const similarity = calculateStringSimilarity(spokenClean, targetClean);
                 const score = Math.round(similarity * 100);
+                debugLog(`SHORT WORD SIMILARITY - ${score}%`);
                 return Math.max(0, score);
             }
-            
+          
+            // Longer words use stricter matching
+            if (Math.abs(spokenClean.length - targetClean.length) <= 1) {
+                let matches = 0;
+                const maxLen = Math.max(spokenClean.length, targetClean.length);
+              
+                for (let i = 0; i < maxLen; i++) {
+                    if (spokenClean[i] === targetClean[i]) {
+                        matches++;
+                    }
+                }
+              
+                const score = Math.round((matches / maxLen) * 100);
+                debugLog(`CHARACTER MATCH - ${matches}/${maxLen} = ${score}%`);
+                return Math.max(0, score);
+            }
+          
+            debugLog('NO SIGNIFICANT MATCH - 0%');
+            return 0;
+        }
+
+        function checkSyllableMatch(spokenOriginal, spokenClean, targetClean) {
+            // Define syllable mappings for problematic words
+            const syllableWords = {
+                'мак': {
+                    syllables: ['ма', 'м'],
+                    englishSyllables: ['ma', 'm'],
+                    partialSyllables: ['мо', 'mo'] // common misrecognitions
+                },
+                'кот': {
+                    syllables: ['ко', 'к'],
+                    englishSyllables: ['ko', 'k', 'co'],
+                    partialSyllables: ['кo', 'ka', 'ка']
+                },
+                'том': {
+                    syllables: ['то', 'т'],
+                    englishSyllables: ['to', 't'],
+                    partialSyllables: ['та', 'ta']
+                }
+            };
+          
+            if (!syllableWords[targetClean]) {
+                return 0;
+            }
+          
+            const wordData = syllableWords[targetClean];
+          
+            // Check if spoken matches any expected syllables (Cyrillic)
+            for (const syllable of wordData.syllables) {
+                if (spokenClean === syllable) {
+                    debugLog(`Found Cyrillic syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 85; // Good score for syllable recognition
+                }
+            }
+          
+            // Check if spoken matches any English syllables
+            for (const syllable of wordData.englishSyllables) {
+                if (spokenOriginal === syllable) {
+                    debugLog(`Found English syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 85; // Good score for syllable recognition
+                }
+            }
+          
+            // Check partial syllables (common misrecognitions)
+            for (const syllable of wordData.partialSyllables) {
+                if (spokenClean === syllable || spokenOriginal === syllable) {
+                    debugLog(`Found partial syllable match: "${syllable}" for word "${targetClean}"`);
+                    return 75; // Decent score for partial recognition
+                }
+            }
+          
             return 0;
         }
 
         function checkCrossLanguageMatch(spoken, target) {
+            // Dictionary of Russian words that might be recognized as English/Latin equivalents
             const crossLangMap = {
                 'мак': ['mac', 'mack', 'mak'],
                 'кот': ['cat', 'kot'],
@@ -1303,73 +1591,28 @@
                 'мекка': ['mecca', 'mekka'],
                 'макет': ['maquette', 'maket']
             };
-            
+          
             if (crossLangMap[target]) {
                 for (const variant of crossLangMap[target]) {
                     if (spoken === variant) {
-                        return 100;
+                        debugLog(`Found cross-language match: ${spoken} -> ${target}`);
+                        return 100; // Perfect score for correct cross-language recognition
                     }
-                    
+                  
+                    // Check for close matches
                     const similarity = calculateStringSimilarity(spoken, variant);
                     if (similarity > 0.8) {
+                        debugLog(`Close cross-language match: ${spoken} -> ${variant} (similarity: ${similarity})`);
                         return Math.round(similarity * 95);
                     }
                 }
             }
-            
-            return 0;
-        }
-
-        function checkSyllableMatch(spokenOriginal, spokenClean, targetClean) {
-            const syllableWords = {
-                'мак': {
-                    syllables: ['ма', 'м'],
-                    englishSyllables: ['ma', 'm'],
-                    partialSyllables: ['мо', 'mo']
-                },
-                'кот': {
-                    syllables: ['ко', 'к'],
-                    englishSyllables: ['ko', 'k', 'co'],
-                    partialSyllables: ['кo', 'ka', 'ка']
-                },
-                'том': {
-                    syllables: ['то', 'т'],
-                    englishSyllables: ['to', 't'],
-                    partialSyllables: ['та', 'ta']
-                }
-            };
-            
-            if (!syllableWords[targetClean]) {
-                return 0;
-            }
-            
-            const wordData = syllableWords[targetClean];
-            
-            // Check Cyrillic syllables
-            for (const syllable of wordData.syllables) {
-                if (spokenClean === syllable) {
-                    return 85;
-                }
-            }
-            
-            // Check English syllables
-            for (const syllable of wordData.englishSyllables) {
-                if (spokenOriginal === syllable) {
-                    return 85;
-                }
-            }
-            
-            // Check partial syllables
-            for (const syllable of wordData.partialSyllables) {
-                if (spokenClean === syllable || spokenOriginal === syllable) {
-                    return 75;
-                }
-            }
-            
+          
             return 0;
         }
 
         function checkPhoneticMatch(spoken, target) {
+            // Simple phonetic matching for when speech recognition uses Latin characters
             const phoneticMap = {
                 'м': 'm',
                 'а': 'a',
@@ -1378,49 +1621,80 @@
                 'т': 't',
                 'е': 'e'
             };
-            
+          
             let phoneticTarget = '';
             for (const char of target) {
                 phoneticTarget += phoneticMap[char] || char;
             }
-            
+          
+            debugLog(`Phonetic comparison: ${spoken} vs ${phoneticTarget}`);
+          
             if (spoken === phoneticTarget) {
-                return 90;
+                return 90; // High score for phonetic match
             }
-            
+          
             const similarity = calculateStringSimilarity(spoken, phoneticTarget);
             if (similarity > 0.7) {
                 return Math.round(similarity * 80);
             }
-            
+          
             return 0;
+        }
+
+        function generateVariations(word) {
+            const variations = [];
+          
+            // Common Russian speech recognition variations
+            const substitutions = {
+                'а': ['о'], // unstressed 'a' sounds like 'o'
+                'о': ['а'], // unstressed 'o' sounds like 'a'
+                'е': ['и', 'э'], // 'e' variations
+                'к': ['г'], // consonant confusion
+                'т': ['д'], // consonant confusion
+                'м': ['н'] // nasal confusion
+            };
+          
+            // Generate single-character substitutions
+            for (let i = 0; i < word.length; i++) {
+                const char = word[i];
+                if (substitutions[char]) {
+                    for (const sub of substitutions[char]) {
+                        const variation = word.substring(0, i) + sub + word.substring(i + 1);
+                        variations.push(variation);
+                    }
+                }
+            }
+          
+            return variations;
         }
 
         function calculateStringSimilarity(s1, s2) {
             if (s1 === s2) return 1.0;
             if (s1.length === 0 || s2.length === 0) return 0.0;
-            
+          
             const maxLen = Math.max(s1.length, s2.length);
-            
+            const minLen = Math.min(s1.length, s2.length);
+          
+            // Levenshtein distance
             const matrix = Array(s2.length + 1).fill().map(() => Array(s1.length + 1).fill(0));
-            
+          
             for (let i = 0; i <= s1.length; i++) matrix[0][i] = i;
             for (let j = 0; j <= s2.length; j++) matrix[j][0] = j;
-            
+          
             for (let j = 1; j <= s2.length; j++) {
                 for (let i = 1; i <= s1.length; i++) {
                     if (s1[i-1] === s2[j-1]) {
                         matrix[j][i] = matrix[j-1][i-1];
                     } else {
                         matrix[j][i] = Math.min(
-                            matrix[j-1][i] + 1,
-                            matrix[j][i-1] + 1,
-                            matrix[j-1][i-1] + 1
+                            matrix[j-1][i] + 1,    // deletion
+                            matrix[j][i-1] + 1,    // insertion
+                            matrix[j-1][i-1] + 1   // substitution
                         );
                     }
                 }
             }
-            
+          
             const distance = matrix[s2.length][s1.length];
             return Math.max(0, 1 - (distance / maxLen));
         }
@@ -1428,9 +1702,9 @@
         function showPronunciationScore(score, spoken, target) {
             const scoreCircle = document.getElementById('scoreCircle');
             const scoreMessage = document.getElementById('scoreMessage');
-            
+          
             scoreCircle.textContent = score + '%';
-            
+          
             if (score >= 95) {
                 scoreMessage.textContent = 'Perfect! 🌟';
                 scoreCircle.style.borderColor = '#28a745';
@@ -1451,21 +1725,21 @@
                 scoreMessage.textContent = 'Listen and try again! 👂';
                 scoreCircle.style.borderColor = '#dc3545';
             }
-            
+          
             stats.scores.push(score);
             stats.wordsPracticed++;
             stats.totalScore += score;
-            
+          
             if (score >= 80) {
                 stats.currentStreak++;
                 stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
             } else {
                 stats.currentStreak = 0;
             }
-            
+          
             checkAchievements();
             updateStats();
-            
+          
             if (score >= 80) {
                 setTimeout(() => {
                     document.getElementById('nextBtn').disabled = false;
@@ -1473,82 +1747,114 @@
             }
         }
 
-        function addExp(points) {
-            stats.exp += points;
-            
-            const expNeeded = stats.level * 100;
-            if (stats.exp >= expNeeded) {
-                stats.level++;
-                stats.exp = stats.exp - expNeeded;
-                showAchievement('🆙', 'Level Up!', `Welcome to Level ${stats.level}!`);
+        function playCurrentWord() {
+            if (!moduleStarted || currentWordIndex >= modules[currentModule].words.length) {
+                return;
             }
-            
-            updateLevelDisplay();
+          
+            const word = modules[currentModule].words[currentWordIndex];
+            displayCurrentWord();
+            playTextToSpeech(word);
         }
 
-        function updateLevelDisplay() {
-            document.getElementById('currentLevel').textContent = stats.level;
-            const expNeeded = stats.level * 100;
-            document.getElementById('levelExp').textContent = `${stats.exp}/${expNeeded} XP`;
-            
-            const expPercent = (stats.exp / expNeeded) * 100;
-            document.getElementById('expFill').style.width = expPercent + '%';
-        }
-
-        function showAchievement(icon, title, description) {
-            const popup = document.getElementById('achievementPopup');
-            document.getElementById('achievementTitle').textContent = title;
-            document.getElementById('achievementDesc').textContent = description;
-            popup.querySelector('.achievement-icon').textContent = icon;
-            
-            popup.classList.remove('hidden');
-            
-            setTimeout(() => {
-                popup.classList.add('hidden');
-            }, 3000);
-        }
-
-        function checkAchievements() {
-            if (stats.wordsPracticed === 1 && !stats.achievements.includes('firstWord')) {
-                stats.achievements.push('firstWord');
-                showAchievement(achievements.firstWord.icon, achievements.firstWord.title, achievements.firstWord.desc);
-                addExp(25);
-            }
-            
-            if (stats.currentStreak === 5 && !stats.achievements.includes('streak5')) {
-                stats.achievements.push('streak5');
-                stats.badges.push('🔥 Fire Streak');
-                showAchievement(achievements.streak5.icon, achievements.streak5.title, achievements.streak5.desc);
-                addExp(50);
-            }
-            
-            if (stats.currentStreak === 10 && !stats.achievements.includes('streak10')) {
-                stats.achievements.push('streak10');
-                stats.badges.push('⚡ Lightning Fast');
-                showAchievement(achievements.streak10.icon, achievements.streak10.title, achievements.streak10.desc);
-                addExp(100);
-            }
-            
-            if (stats.wordsPracticed === 20 && !stats.achievements.includes('speedDemon')) {
-                stats.achievements.push('speedDemon');
-                stats.badges.push('🚀 Speed Master');
-                showAchievement(achievements.speedDemon.icon, achievements.speedDemon.title, achievements.speedDemon.desc);
-                addExp(75);
-            }
-            
-            if (stats.currentStreak > stats.bestStreak) {
-                stats.bestStreak = stats.currentStreak;
+        function updateButtons() {
+            const listenBtn = document.getElementById('listenBtn');
+            const micBtn = document.getElementById('micBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+          
+            if (!moduleStarted) {
+                listenBtn.disabled = true;
+                micBtn.disabled = true;
+                nextBtn.disabled = true;
+                prevBtn.disabled = true;
+            } else if (currentWordIndex >= modules[currentModule].words.length) {
+                listenBtn.disabled = true;
+                micBtn.disabled = true;
+                nextBtn.disabled = true;
+                prevBtn.disabled = currentWordIndex === 0;
+            } else {
+                listenBtn.disabled = false;
+                micBtn.disabled = false;
+                nextBtn.disabled = false;
+                prevBtn.disabled = currentWordIndex === 0;
+                listenBtn.textContent = '🔊 Listen';
             }
         }
 
         function updateStats() {
             document.getElementById('wordsPracticed').textContent = stats.wordsPracticed;
-            
+          
             const avgScore = stats.scores.length > 0 
                 ? Math.round(stats.totalScore / stats.scores.length)
                 : 0;
             document.getElementById('averageScore').textContent = avgScore + '%';
             document.getElementById('currentStreak').textContent = stats.currentStreak;
+        }
+
+        function selectModule(moduleNum) {
+            currentModule = moduleNum;
+            currentWordIndex = 0;
+            moduleStarted = true;
+          
+            document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.module-btn')[moduleNum - 1].classList.add('active');
+          
+            updateInstructionArea();
+            resetWordDisplay();
+            updateButtons();
+            updateProgress();
+            updateExerciseDisplay();
+          
+            if (moduleNum === 6) {
+                document.getElementById('stressExplanation').classList.remove('hidden');
+            } else {
+                document.getElementById('stressExplanation').classList.add('hidden');
+            }
+          
+            debugLog(`Module ${moduleNum} selected - ${modules[moduleNum].words.length} words available`);
+        }
+
+        function displayCurrentWord() {
+            const word = modules[currentModule].words[currentWordIndex];
+            document.getElementById('currentWord').textContent = word;
+          
+            const wordImage = document.getElementById('wordImage');
+            if (modules[currentModule].images[word]) {
+                wordImage.src = imageBaseUrl + modules[currentModule].images[word];
+                wordImage.classList.remove('hidden');
+              
+                wordImage.onerror = () => {
+                    debugLog(`Image failed to load: ${imageBaseUrl + modules[currentModule].images[word]}`);
+                    wordImage.classList.add('hidden');
+                };
+            } else {
+                wordImage.classList.add('hidden');
+            }
+        }
+
+        function updateInstructionArea() {
+            const instruction = document.getElementById('instructionArea');
+            const moduleLetters = modules[currentModule].letters.join(', ');
+            instruction.querySelector('h3').textContent = moduleLetters;
+            instruction.querySelector('p').textContent = modules[currentModule].instruction;
+        }
+
+        function resetWordDisplay() {
+            document.getElementById('currentWord').textContent = 'Ready to Start';
+            document.getElementById('wordImage').classList.add('hidden');
+            hideFeedback();
+        }
+
+        function updateProgress() {
+            if (!moduleStarted) {
+                document.getElementById('progressFill').style.width = '0%';
+                return;
+            }
+          
+            const totalWords = modules[currentModule].words.length;
+            const progress = (currentWordIndex / totalWords) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
         }
 
         function showFeedback(message, type) {
@@ -1562,11 +1868,19 @@
             document.getElementById('feedback').classList.add('hidden');
         }
 
-        // Initialize when page loads
+        function markGroupCompleted(groupNumber) {
+            const completedGroups = JSON.parse(localStorage.getItem('completedGroups') || '[]');
+            if (!completedGroups.includes(groupNumber)) {
+                completedGroups.push(groupNumber);
+                localStorage.setItem('completedGroups', JSON.stringify(completedGroups));
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            debugLog('DOM loaded - initializing platform');
             initSpeechRecognition();
-            console.log('Russian Learning Platform initialized');
-            
+            debugLog('Russian Learning Platform initialized successfully');
+          
             document.addEventListener('click', function() {
                 if (currentAudio && currentAudio.paused) {
                     hideStopButton();
@@ -1579,14 +1893,4 @@
         });
     </script>
 </body>
-</html>d = true;
-                micBtn.disabled = true;
-                nextBtn.disabled = true;
-                prevBtn.disabled = true;
-            } else if (currentWordIndex >= modules[currentModule].words.length) {
-                listenBtn.disabled = true;
-                micBtn.disabled = true;
-                nextBtn.disabled = true;
-                prevBtn.disabled = currentWordIndex === 0;
-            } else {
-                listenBtn.disable
+</html>
