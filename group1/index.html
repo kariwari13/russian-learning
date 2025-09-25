@@ -1122,13 +1122,22 @@
                 showFeedback('Speak now...', 'info');
                 debugLog('Speech Recognition started - listening for input');
                 
-                // Set timeout for automatic stop (helps with short words)
+                // Set timeout for automatic stop with retry mechanism
                 recognitionTimeout = setTimeout(() => {
                     if (isListening && recognition) {
-                        debugLog('Recognition timeout reached - stopping recognition');
+                        debugLog('Recognition timeout reached - stopping and offering retry');
                         recognition.stop();
+                        
+                        // Show retry option for problematic words
+                        const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
+                        if (currentWord.length <= 3) {
+                            setTimeout(() => {
+                                showFeedback('Having trouble? Try speaking louder and clearer, or use the Skip option below.', 'info');
+                                addSkipButton();
+                            }, 1000);
+                        }
                     }
-                }, 5000); // 5 second timeout
+                }, 6000); // Extended timeout for short words
             };
 
             recognition.onresult = (event) => {
@@ -1207,19 +1216,24 @@
                 
                 switch (event.error) {
                     case 'no-speech':
-                        showFeedback('No speech detected. Please try again.', 'error');
+                        showFeedback('No speech detected. Try speaking louder and closer to the microphone.', 'error');
+                        addSkipButton();
                         break;
                     case 'audio-capture':
-                        showFeedback('Microphone not accessible. Check permissions.', 'error');
+                        showFeedback('Microphone not accessible. Check permissions and try again.', 'error');
                         break;
                     case 'not-allowed':
-                        showFeedback('Microphone permission denied.', 'error');
+                        showFeedback('Microphone permission denied. Please allow microphone access.', 'error');
                         break;
                     case 'network':
-                        showFeedback('Network error. Check your connection.', 'error');
+                        showFeedback('Network error. Check your internet connection.', 'error');
+                        break;
+                    case 'aborted':
+                        // Don't show error for intentional aborts
                         break;
                     default:
-                        showFeedback('Could not recognize speech. Try again.', 'error');
+                        showFeedback('Having trouble recognizing speech. You can skip this word if needed.', 'error');
+                        addSkipButton();
                 }
                 
                 stopListening();
@@ -1278,45 +1292,116 @@
             }
 
             try {
-                // Clear any existing timeout
+                // Clear any existing timeout and skip button
                 if (recognitionTimeout) {
                     clearTimeout(recognitionTimeout);
                     recognitionTimeout = null;
                 }
                 
-                // Special handling for problematic words
+                const skipBtn = document.getElementById('skipBtn');
+                if (skipBtn) {
+                    skipBtn.remove();
+                }
+                
+                // Get current word info
                 const currentWord = modules[currentModule].words[currentWordIndex];
                 const cleanWord = currentWord.replace(/́/g, '');
                 
-                debugLog(`Attempting to start recognition for word: "${cleanWord}"`);
+                debugLog(`Attempting to start recognition for word: "${cleanWord}" in module ${currentModule}`);
                 
-                // For short words, try multiple language settings
-                if (cleanWord.length <= 3) {
-                    debugLog('Short word detected - using enhanced recognition');
-                    
-                    // Try with both Russian and multilingual recognition
-                    recognition.lang = 'ru-RU';
-                    
-                    // For very short words, also add English fallback
-                    setTimeout(() => {
-                        if (!isListening) {
-                            debugLog('First attempt failed, trying multilingual recognition');
-                            recognition.lang = 'ru';
-                        }
-                    }, 2000);
-                }
+                // Adjust recognition settings based on word and module
+                setupRecognitionForWord(cleanWord, currentModule);
                 
                 recognition.abort(); // Ensure clean state
                 
                 setTimeout(() => {
                     debugLog('Starting recognition after cleanup delay');
-                    recognition.start();
-                }, 100);
+                    try {
+                        recognition.start();
+                    } catch (startError) {
+                        debugLog(`Recognition start failed: ${startError.message}`);
+                        showFeedback('Microphone issue. Try again or use skip option.', 'error');
+                        addSkipButton();
+                    }
+                }, 200);
                 
             } catch (error) {
                 debugLog(`Failed to start recognition: ${error.message}`);
-                showFeedback('Could not start recording', 'error');
+                showFeedback('Could not start recording. You can skip this word.', 'error');
+                addSkipButton();
             }
+        }
+
+        function setupRecognitionForWord(word, moduleNumber) {
+            // Base settings
+            recognition.lang = 'ru-RU';
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 15;
+            
+            // Special handling for problematic words
+            const problematicWords = ['мак', 'кот', 'том', 'акт'];
+            
+            if (problematicWords.includes(word.toLowerCase())) {
+                debugLog(`Problematic word detected: ${word} - using enhanced settings`);
+                
+                // Try different language codes for better recognition
+                if (Math.random() > 0.5) {
+                    recognition.lang = 'ru';
+                } else {
+                    recognition.lang = 'ru-RU';
+                }
+                
+                // Increase sensitivity for short words
+                recognition.maxAlternatives = 20;
+            }
+            
+            // Module-specific adjustments
+            if (moduleNumber === 6) { // Stress rules module
+                debugLog('Stress rules module - using relaxed settings');
+                recognition.lang = 'ru-RU';
+                recognition.maxAlternatives = 25; // Even more alternatives for stress words
+            }
+            
+            debugLog(`Recognition configured: lang=${recognition.lang}, maxAlternatives=${recognition.maxAlternatives}`);
+        }
+
+        function addSkipButton() {
+            // Remove existing skip button if present
+            const existingSkipBtn = document.getElementById('skipBtn');
+            if (existingSkipBtn) {
+                existingSkipBtn.remove();
+            }
+            
+            // Add skip button after controls
+            const controlsArea = document.getElementById('controlsArea');
+            const skipBtn = document.createElement('button');
+            skipBtn.id = 'skipBtn';
+            skipBtn.className = 'control-btn';
+            skipBtn.style.background = '#6c757d';
+            skipBtn.innerHTML = '⏭️ Skip Word';
+            skipBtn.onclick = skipCurrentWord;
+            
+            controlsArea.appendChild(skipBtn);
+        }
+
+        function skipCurrentWord() {
+            debugLog('User chose to skip word');
+            
+            // Remove skip button
+            const skipBtn = document.getElementById('skipBtn');
+            if (skipBtn) {
+                skipBtn.remove();
+            }
+            
+            // Give partial score for skipping
+            showPronunciationScore(60, 'skipped', modules[currentModule].words[currentWordIndex]);
+            showFeedback('Word skipped. Try to practice this word later!', 'info');
+            
+            // Enable next button
+            setTimeout(() => {
+                document.getElementById('nextBtn').disabled = false;
+            }, 1000);
         }
 
         function stopListening() {
@@ -1332,11 +1417,15 @@
             micBtn.classList.remove('listening');
             micBtn.textContent = '🎤 Speak';
             
+            // Remove skip button when stopping normally
+            const skipBtn = document.getElementById('skipBtn');
+            if (skipBtn) {
+                skipBtn.remove();
+            }
+            
             setTimeout(() => {
                 micBtn.disabled = false;
             }, 500);
-            
-            hideFeedback();
         }
 
         function calculatePronunciationScore(spoken, target) {
