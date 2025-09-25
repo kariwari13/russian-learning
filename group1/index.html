@@ -1122,22 +1122,13 @@
                 showFeedback('Speak now...', 'info');
                 debugLog('Speech Recognition started - listening for input');
                 
-                // Set timeout for automatic stop with retry mechanism
+                // Set timeout for automatic stop
                 recognitionTimeout = setTimeout(() => {
                     if (isListening && recognition) {
-                        debugLog('Recognition timeout reached - stopping and offering retry');
+                        debugLog('Recognition timeout reached - stopping recognition');
                         recognition.stop();
-                        
-                        // Show retry option for problematic words
-                        const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
-                        if (currentWord.length <= 3) {
-                            setTimeout(() => {
-                                showFeedback('Having trouble? Try speaking louder and clearer, or use the Skip option below.', 'info');
-                                addSkipButton();
-                            }, 1000);
-                        }
                     }
-                }, 6000); // Extended timeout for short words
+                }, 6000);
             };
 
             recognition.onresult = (event) => {
@@ -1214,33 +1205,43 @@
             recognition.onerror = (event) => {
                 debugLog(`Speech Recognition error: ${event.error} - ${event.message || 'no message'}`);
                 
+                let errorMessage = '';
+                
                 switch (event.error) {
                     case 'no-speech':
-                        showFeedback('No speech detected. Try speaking louder and closer to the microphone.', 'error');
-                        addSkipButton();
+                        errorMessage = 'No speech detected. Try again.';
                         break;
                     case 'audio-capture':
-                        showFeedback('Microphone not accessible. Check permissions and try again.', 'error');
+                        errorMessage = 'Microphone not accessible. Check permissions.';
                         break;
                     case 'not-allowed':
-                        showFeedback('Microphone permission denied. Please allow microphone access.', 'error');
+                        errorMessage = 'Microphone permission denied.';
                         break;
                     case 'network':
-                        showFeedback('Network error. Check your internet connection.', 'error');
+                        errorMessage = 'Network error. Check connection.';
                         break;
                     case 'aborted':
                         // Don't show error for intentional aborts
-                        break;
+                        stopListening();
+                        return;
                     default:
-                        showFeedback('Having trouble recognizing speech. You can skip this word if needed.', 'error');
-                        addSkipButton();
+                        errorMessage = 'Could not recognize speech. Try again.';
                 }
                 
+                showFeedback(errorMessage, 'error');
                 stopListening();
             };
 
             recognition.onend = () => {
                 debugLog('Speech Recognition ended');
+                
+                // If we're still marked as listening but recognition ended, 
+                // it means no results were captured
+                if (isListening) {
+                    debugLog('Recognition ended without results');
+                    showFeedback('No speech detected. Try speaking louder.', 'error');
+                }
+                
                 stopListening();
             };
             
