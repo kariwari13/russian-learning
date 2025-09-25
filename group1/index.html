@@ -412,7 +412,15 @@
         }
 
         .debug-panel {
-            display: none; /* Hide debug panel from users */
+            background: #f1f3f4;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
         .debug-panel h4 {
@@ -1099,7 +1107,6 @@
             
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
                 debugLog('Speech Recognition API not supported in this browser');
-                showFeedback('Speech recognition not supported in this browser', 'error');
                 return;
             }
 
@@ -1110,7 +1117,7 @@
             recognition.lang = 'ru-RU';
             recognition.continuous = false;
             recognition.interimResults = true; // Enable interim results to catch short words
-            recognition.maxAlternatives = 10; // Increase alternatives for better detection
+            recognition.maxAlternatives = 5; // Get multiple alternatives
             
             debugLog('Speech Recognition configured with enhanced settings');
 
@@ -1122,22 +1129,13 @@
                 showFeedback('Speak now...', 'info');
                 debugLog('Speech Recognition started - listening for input');
                 
-                // Set timeout for automatic stop with retry mechanism
+                // Set timeout for automatic stop (helps with short words)
                 recognitionTimeout = setTimeout(() => {
                     if (isListening && recognition) {
-                        debugLog('Recognition timeout reached - stopping and offering retry');
+                        debugLog('Recognition timeout reached - stopping recognition');
                         recognition.stop();
-                        
-                        // Show retry option for problematic words
-                        const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
-                        if (currentWord.length <= 3) {
-                            setTimeout(() => {
-                                showFeedback('Having trouble? Try speaking louder and clearer, or use the Skip option below.', 'info');
-                                addSkipButton();
-                            }, 1000);
-                        }
                     }
-                }, 6000); // Extended timeout for short words
+                }, 5000); // 5 second timeout
             };
 
             recognition.onresult = (event) => {
@@ -1145,9 +1143,8 @@
                 
                 let finalTranscript = '';
                 let interimTranscript = '';
-                let bestAlternatives = [];
                 
-                // Process all results and collect alternatives
+                // Process all results (both interim and final)
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const result = event.results[i];
                     debugLog(`Result ${i}: isFinal=${result.isFinal}, confidence=${result[0].confidence}, transcript="${result[0].transcript}"`);
@@ -1158,57 +1155,29 @@
                         interimTranscript += result[0].transcript;
                     }
                     
-                    // Collect all alternatives for better matching
-                    for (let j = 0; j < Math.min(result.length, 10); j++) {
-                        bestAlternatives.push({
-                            transcript: result[j].transcript.trim(),
-                            confidence: result[j].confidence,
-                            isFinal: result.isFinal
-                        });
+                    // Log all alternatives for debugging
+                    for (let j = 0; j < result.length; j++) {
                         debugLog(`  Alternative ${j}: "${result[j].transcript}" (confidence: ${result[j].confidence})`);
                     }
                 }
                 
-                // Process final result if available
-                if (finalTranscript.trim()) {
+                // Process final result
+                if (finalTranscript) {
                     const transcript = finalTranscript.trim();
-                    debugLog(`Processing final transcript: "${transcript}"`);
+                    debugLog(`Final transcript received: "${transcript}"`);
                     processRecognitionResult(transcript, event.results[event.results.length - 1]);
-                    return;
-                }
-                
-                // For short words like "МАК", check if any alternative matches
-                const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
-                debugLog(`Current target word: "${currentWord}"`);
-                
-                // Check all alternatives for potential matches
-                for (const alt of bestAlternatives) {
-                    if (alt.transcript) {
-                        const score = calculatePronunciationScore(alt.transcript, currentWord);
-                        debugLog(`Alternative "${alt.transcript}" scored: ${score}%`);
-                        
-                        if (score >= 80) {
-                            debugLog(`Found good match in alternatives: "${alt.transcript}"`);
-                            processRecognitionResult(alt.transcript, null);
-                            return;
-                        }
-                    }
-                }
-                
-                // If interim result looks promising for short words
-                if (interimTranscript.trim()) {
+                } else if (interimTranscript) {
+                    // For very short words, interim results might be all we get
                     const transcript = interimTranscript.trim();
-                    debugLog(`Checking interim transcript: "${transcript}"`);
+                    debugLog(`Processing interim transcript: "${transcript}"`);
                     
-                    const score = calculatePronunciationScore(transcript, currentWord);
-                    if (score >= 80 || transcript.length >= currentWord.length - 1) {
-                        debugLog(`Interim result looks good, processing: "${transcript}"`);
-                        processRecognitionResult(transcript, null);
-                        return;
+                    // If interim result looks complete (short word), process it
+                    const currentWord = modules[currentModule].words[currentWordIndex].replace(/́/g, '');
+                    if (transcript.length >= currentWord.length - 1) {
+                        debugLog('Interim result appears complete - processing it');
+                        processRecognitionResult(transcript, event.results[event.results.length - 1]);
                     }
                 }
-                
-                debugLog('No suitable results found in this recognition event');
             };
 
             recognition.onerror = (event) => {
@@ -1216,24 +1185,19 @@
                 
                 switch (event.error) {
                     case 'no-speech':
-                        showFeedback('No speech detected. Try speaking louder and closer to the microphone.', 'error');
-                        addSkipButton();
+                        showFeedback('No speech detected. Please try again.', 'error');
                         break;
                     case 'audio-capture':
-                        showFeedback('Microphone not accessible. Check permissions and try again.', 'error');
+                        showFeedback('Microphone not accessible. Check permissions.', 'error');
                         break;
                     case 'not-allowed':
-                        showFeedback('Microphone permission denied. Please allow microphone access.', 'error');
+                        showFeedback('Microphone permission denied.', 'error');
                         break;
                     case 'network':
-                        showFeedback('Network error. Check your internet connection.', 'error');
-                        break;
-                    case 'aborted':
-                        // Don't show error for intentional aborts
+                        showFeedback('Network error. Check your connection.', 'error');
                         break;
                     default:
-                        showFeedback('Having trouble recognizing speech. You can skip this word if needed.', 'error');
-                        addSkipButton();
+                        showFeedback('Could not recognize speech. Try again.', 'error');
                 }
                 
                 stopListening();
@@ -1298,28 +1262,7 @@
                     recognitionTimeout = null;
                 }
                 
-                // Special handling for problematic words
-                const currentWord = modules[currentModule].words[currentWordIndex];
-                const cleanWord = currentWord.replace(/́/g, '');
-                
-                debugLog(`Attempting to start recognition for word: "${cleanWord}"`);
-                
-                // For short words, try multiple language settings
-                if (cleanWord.length <= 3) {
-                    debugLog('Short word detected - using enhanced recognition');
-                    
-                    // Try with both Russian and multilingual recognition
-                    recognition.lang = 'ru-RU';
-                    
-                    // For very short words, also add English fallback
-                    setTimeout(() => {
-                        if (!isListening) {
-                            debugLog('First attempt failed, trying multilingual recognition');
-                            recognition.lang = 'ru';
-                        }
-                    }, 2000);
-                }
-                
+                debugLog('Attempting to start recognition');
                 recognition.abort(); // Ensure clean state
                 
                 setTimeout(() => {
@@ -1331,44 +1274,6 @@
                 debugLog(`Failed to start recognition: ${error.message}`);
                 showFeedback('Could not start recording', 'error');
             }
-        }
-
-        function addSkipButton() {
-            // Remove existing skip button if present
-            const existingSkipBtn = document.getElementById('skipBtn');
-            if (existingSkipBtn) {
-                existingSkipBtn.remove();
-            }
-            
-            // Add skip button after controls
-            const controlsArea = document.getElementById('controlsArea');
-            const skipBtn = document.createElement('button');
-            skipBtn.id = 'skipBtn';
-            skipBtn.className = 'control-btn';
-            skipBtn.style.background = '#6c757d';
-            skipBtn.innerHTML = '⏭️ Skip Word';
-            skipBtn.onclick = skipCurrentWord;
-            
-            controlsArea.appendChild(skipBtn);
-        }
-
-        function skipCurrentWord() {
-            debugLog('User chose to skip word');
-            
-            // Remove skip button
-            const skipBtn = document.getElementById('skipBtn');
-            if (skipBtn) {
-                skipBtn.remove();
-            }
-            
-            // Give partial score for skipping
-            showPronunciationScore(60, 'skipped', modules[currentModule].words[currentWordIndex]);
-            showFeedback('Word skipped. Try to practice this word later!', 'info');
-            
-            // Enable next button
-            setTimeout(() => {
-                document.getElementById('nextBtn').disabled = false;
-            }, 1000);
         }
 
         function stopListening() {
@@ -1384,15 +1289,11 @@
             micBtn.classList.remove('listening');
             micBtn.textContent = '🎤 Speak';
             
-            // Remove skip button when stopping normally
-            const skipBtn = document.getElementById('skipBtn');
-            if (skipBtn) {
-                skipBtn.remove();
-            }
-            
             setTimeout(() => {
                 micBtn.disabled = false;
             }, 500);
+            
+            hideFeedback();
         }
 
         function calculatePronunciationScore(spoken, target) {
