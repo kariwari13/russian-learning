@@ -1225,7 +1225,7 @@
         function checkCrossLanguageMatch(spoken, target) {
             const crossLangMap = {
                 'мак': ['mac', 'mack', 'mak'],
-                'кот': ['cat', 'kot', 'cot', 'coat'],
+                'кот': ['cat', 'kot'],
                 'том': ['tom'],
                 'мама': ['mama'],
                 'какао': ['cacao', 'kakao'],
@@ -1245,12 +1245,6 @@
                     if (spoken === variant) {
                         return 100;
                     }
-                    
-                    // Проверка на близкое совпадение
-                    const similarity = calculateStringSimilarity(spoken, variant);
-                    if (similarity > 0.8) {
-                        return Math.round(similarity * 95);
-                    }
                 }
             }
             
@@ -1266,8 +1260,8 @@
                 },
                 'кот': {
                     syllables: ['ко', 'к'],
-                    englishSyllables: ['ko', 'k', 'co', 'ca'],
-                    partialSyllables: ['ка', 'ka', 'го', 'go']
+                    englishSyllables: ['ko', 'k', 'co'],
+                    partialSyllables: ['ка', 'ka']
                 },
                 'том': {
                     syllables: ['то', 'т'],
@@ -1304,35 +1298,6 @@
             }
             
             return 0;
-        }
-
-        function calculateStringSimilarity(s1, s2) {
-            if (s1 === s2) return 1.0;
-            if (s1.length === 0 || s2.length === 0) return 0.0;
-            
-            const maxLen = Math.max(s1.length, s2.length);
-            
-            const matrix = Array(s2.length + 1).fill().map(() => Array(s1.length + 1).fill(0));
-            
-            for (let i = 0; i <= s1.length; i++) matrix[0][i] = i;
-            for (let j = 0; j <= s2.length; j++) matrix[j][0] = j;
-            
-            for (let j = 1; j <= s2.length; j++) {
-                for (let i = 1; i <= s1.length; i++) {
-                    if (s1[i-1] === s2[j-1]) {
-                        matrix[j][i] = matrix[j-1][i-1];
-                    } else {
-                        matrix[j][i] = Math.min(
-                            matrix[j-1][i] + 1,
-                            matrix[j][i-1] + 1,
-                            matrix[j-1][i-1] + 1
-                        );
-                    }
-                }
-            }
-            
-            const distance = matrix[s2.length][s1.length];
-            return Math.max(0, 1 - (distance / maxLen));
         }
 
         function checkPhoneticMatch(spoken, target) {
@@ -1447,3 +1412,4 @@
     </script>
 </body>
 </html>
+
