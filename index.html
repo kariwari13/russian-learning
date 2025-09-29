@@ -121,9 +121,7 @@
         </div>
         
         <div class="group-card available" onclick="goToGroup(2)">
-            <div class="group-title">Group 2: False Friends 
-                <a href="group2/practice.html" class="practice-link" onclick="event.stopPropagation()">Practice</a>
-            </div>
+            <div class="group-title">Group 2: False Friends</div>
             <div class="group-letters">Р Н С И У В Х</div>
             <div class="group-description">Letters that look familiar but sound different</div>
             <div class="letter-correspondences">
@@ -138,7 +136,10 @@
             <div class="group-progress">
                 <div class="progress-fill" style="width: 100%"></div>
             </div>
-            <div>✅ Available</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span>✅ Available</span>
+                <a href="group2/practice.html" class="practice-link" onclick="event.stopPropagation()">📝 Extra</a>
+            </div>
         </div>
         
         <div class="group-card locked">
