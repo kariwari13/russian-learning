@@ -1,0 +1,31 @@
+# Vosk модель (слишком большая для git)
+vosk-model-*/
+*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Временные файлы
+*.log
+*.tmp
+*.wav
+*.webm
+*.ogg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

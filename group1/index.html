@@ -647,7 +647,7 @@
                     <button class="control-btn" id="listenBtn" onclick="playCurrentWord()">
                         🔊 Listen
                     </button>
-                    <button class="control-btn mic-btn" id="micBtn" onclick="startRecording()" disabled>
+                    <button class="control-btn mic-btn" id="micBtn" onclick="handleMicButton()" disabled>
                         🎤 Speak
                     </button>
                     <button class="control-btn stop-btn hidden" id="stopBtn" onclick="stopAudio()">
@@ -671,6 +671,9 @@
         </div>
     </div>
 
+    <!-- Vosk Integration -->
+    <script src="../vosk-integration.js"></script>
+
     <script>
         // Global variables
         let currentModule = 1;
@@ -681,6 +684,11 @@
         let moduleStarted = false;
         let learningStarted = false;
         let recognitionTimeout = null;
+
+        // Vosk Integration
+        let voskIntegration = null;
+        let useVosk = true; // Попытка использовать Vosk по умолчанию
+        let voskRecording = false;
         
         // Statistics and Gamification
         let stats = {
@@ -1107,7 +1115,68 @@
             };
         }
 
-        function startRecording() {
+        /**
+         * Обработчик кнопки микрофона (toggle: начать/остановить)
+         */
+        async function handleMicButton() {
+            // Если Vosk запись активна - остановить
+            if (voskRecording) {
+                await stopListening();
+                return;
+            }
+
+            // Если Web Speech API активен - остановить
+            if (isListening) {
+                if (recognition) {
+                    recognition.stop();
+                }
+                return;
+            }
+
+            // Иначе - начать запись
+            await startRecording();
+        }
+
+        async function startRecording() {
+            // Vosk Backend (если доступен)
+            if (useVosk && voskIntegration) {
+                try {
+                    const currentWord = modules[currentModule].words[currentWordIndex];
+                    const expectedText = currentWord.replace(/́/g, ''); // Удалить ударения
+
+                    // Обновление UI
+                    const micBtn = document.getElementById('micBtn');
+                    micBtn.classList.add('listening');
+                    micBtn.innerHTML = '🎤 Слушаю...';
+                    showFeedback('Говорите сейчас...', 'info');
+
+                    // Начало записи через Vosk
+                    await voskIntegration.recordAndEvaluate(expectedText, (status) => {
+                        console.log('Vosk статус:', status);
+                        showFeedback(status, 'info');
+                    });
+
+                    voskRecording = true;
+
+                } catch (error) {
+                    console.error('Ошибка Vosk записи:', error);
+
+                    // Fallback на Web Speech API
+                    if (error.message === 'BACKEND_UNAVAILABLE') {
+                        console.log('⚠️ Backend недоступен, переключение на Web Speech API');
+                        useVosk = false;
+                        initSpeechRecognition();
+                        // Повторная попытка с Web Speech API
+                        setTimeout(() => startRecording(), 500);
+                    } else {
+                        showFeedback('Ошибка записи: ' + error.message, 'error');
+                        stopListening();
+                    }
+                }
+                return;
+            }
+
+            // Web Speech API (fallback)
             if (!recognition) {
                 showFeedback('Speech recognition not available', 'error');
                 return;
@@ -1123,9 +1192,9 @@
                     clearTimeout(recognitionTimeout);
                     recognitionTimeout = null;
                 }
-                
+
                 recognition.abort();
-                
+
                 setTimeout(() => {
                     try {
                         recognition.start();
@@ -1133,23 +1202,69 @@
                         showFeedback('Microphone issue. Try again.', 'error');
                     }
                 }, 200);
-                
+
             } catch (error) {
                 showFeedback('Could not start recording', 'error');
             }
         }
 
-        function stopListening() {
+        async function stopListening() {
+            // Остановка записи Vosk
+            if (voskRecording && voskIntegration) {
+                try {
+                    const micBtn = document.getElementById('micBtn');
+                    micBtn.innerHTML = '⏳ Анализ...';
+                    showFeedback('Анализ произношения...', 'info');
+
+                    // Получение результата от Vosk
+                    const result = await voskIntegration.stopAndEvaluate();
+
+                    // Отображение результата
+                    console.log('Vosk результат:', result);
+
+                    showPronunciationScore(
+                        result.accuracy,
+                        result.transcription,
+                        result.expected
+                    );
+
+                    showFeedback(
+                        `Вы сказали: "${result.transcription}" - ${result.feedback}`,
+                        result.accuracy >= 80 ? 'success' : 'error'
+                    );
+
+                    voskRecording = false;
+
+                    // Сброс кнопки
+                    micBtn.classList.remove('listening');
+                    micBtn.innerHTML = '🎤 Speak';
+                    micBtn.disabled = false;
+
+                } catch (error) {
+                    console.error('Ошибка остановки Vosk:', error);
+                    showFeedback('Ошибка обработки: ' + error.message, 'error');
+
+                    voskRecording = false;
+
+                    const micBtn = document.getElementById('micBtn');
+                    micBtn.classList.remove('listening');
+                    micBtn.innerHTML = '🎤 Speak';
+                    micBtn.disabled = false;
+                }
+                return;
+            }
+
+            // Web Speech API
             if (recognitionTimeout) {
                 clearTimeout(recognitionTimeout);
                 recognitionTimeout = null;
             }
-            
+
             isListening = false;
             const micBtn = document.getElementById('micBtn');
             micBtn.classList.remove('listening');
-            micBtn.textContent = 'Speak';
-            
+            micBtn.textContent = '🎤 Speak';
+
             setTimeout(() => {
                 hideFeedback();
                 micBtn.disabled = false;
@@ -1402,8 +1517,29 @@
         }
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            initSpeechRecognition();
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Инициализация Vosk Integration
+            try {
+                // ВАЖНО: Замените URL после деплоя на Render.com!
+                // Например: 'https://your-service-name.onrender.com'
+                voskIntegration = new VoskIntegration('https://russian-speech-recognition.onrender.com');
+
+                // Проверка доступности backend
+                const backendOk = await voskIntegration.checkBackendHealth();
+
+                if (backendOk) {
+                    console.log('✅ Используется Vosk backend для точного распознавания');
+                    useVosk = true;
+                } else {
+                    console.log('⚠️ Vosk backend недоступен, используется Web Speech API');
+                    useVosk = false;
+                    initSpeechRecognition();
+                }
+            } catch (error) {
+                console.log('⚠️ Ошибка инициализации Vosk, используется Web Speech API:', error);
+                useVosk = false;
+                initSpeechRecognition();
+            }
         });
 
         window.addEventListener('beforeunload', function() {

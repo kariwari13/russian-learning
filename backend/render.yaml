@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: russian-speech-recognition
+    env: python
+    buildCommand: "pip install -r requirements.txt && ./download_model.sh"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PORT
+        value: 10000
+    autoDeploy: true
+    healthCheckPath: /health
